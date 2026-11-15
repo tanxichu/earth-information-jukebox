@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Listen to Earth — Arctic sea ice</title><link rel="icon" href="../icon192.png">
+<title>Listen to Earth — NASA EIC jukebox</title><link rel="icon" href="../icon192.png">
 <meta name="description" content="Hear 48 Septembers of Arctic sea ice: a Debussy piano piece thins out as NASA/NSIDC data shrinks. Accessible, audio-first.">
 <link rel="manifest" href="../manifest.webmanifest"><link rel="apple-touch-icon" href="../icon192.png"><meta name="theme-color" content="#1565c0">
 <style>
@@ -19,14 +19,25 @@ input[type=range]{width:100%;height:36px}.big{font-size:36px;font-weight:800;lin
 #cap{min-height:3.4em;font-size:20px}.lang{float:right}label{display:inline-flex;align-items:center;gap:6px;margin-right:12px}
 .step{border-left:4px solid var(--ac);padding-left:12px;margin:8px 0}details summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
 </style></head><body>
-<a class="skip" href="#story" data-i="skip">Skip to the listening experience</a>
+<a class="skip" href="#eicsec" data-i="skip">Skip to the listening experience</a>
 <main>
 <button class="lang" id="lang" aria-label="Switch language / 切换语言">中文</button>
-<h1 data-i="h1">Listen to 48 Septembers of Arctic sea ice</h1>
-<p class="sub" data-i="sub">One piano piece. One number per year. As the ice shrinks, the piano thins out. Best with headphones; turn off your phone's silent switch.</p>
+<h1 data-i="h1">Listen to Earth</h1>
+<p class="sub" data-i="sub">Pick a NASA Earth Information Center animation and hear it: the picture is read pixel by pixel and played on a piano. Then touch a sea-ice map, and hear 48 Septembers of Arctic sea ice. Best with headphones; turn off your phone's silent switch.</p>
+
+<section id="eicsec" class="card" aria-labelledby="h_eic">
+<h2 id="h_eic" data-i="h_eic">1. NASA EIC jukebox: pick an animation, hear it</h2>
+<p class="mut"><b>Purpose:</b> test whether people can <i>hear</i> a real NASA Earth Information Center (SVS) animation change. Technique: the animation is read pixel by pixel in the browser. <b>Sweep</b> mode scans each frame west→east in 8 strips every 2 seconds: each strip becomes one note (more of the feature = higher, louder; none = silence), so you hear <i>where</i> things are. <b>Whole frame</b> mode uses the whole frame's share of the feature to decide how many notes of a public-domain Debussy piece play. The feature is hand-picked for each animation (ice → white, fires and temperature → warm colours, vegetation and rain → green, smoke and carbon monoxide → deep red; logos, dates and colour legends are masked out); for other animations and your own videos it is the feature that changes most, and you can always choose it yourself.</p>
+<div class="row"><label>Animation <select id="evid"></select></label> <label>Mode <select id="emode"><option value="sweep">Sweep across the map (melody = where it is)</option><option value="whole">Whole frame (piano fullness = how much)</option></select></label> <label>Piano follows <select id="efeat"><option value="auto">best match (automatic)</option><option value="white">white / ice / cloud</option><option value="cool">blue / water</option><option value="warm">warm colour</option><option value="green">green / vegetation / rain</option><option value="red">deep red / high concentration</option><option value="dots">small lit dots (city lights, lightning)</option><option value="orange">orange (warm water, CO₂ plumes)</option><option value="bright">brightness</option><option value="edge">detail</option></select></label></div>
+<video id="ev" muted loop playsinline controls style="width:100%;border-radius:8px;background:#000" aria-label="NASA animation"></video>
+<div class="row"><button id="eplay" style="font-size:18px;padding:12px 22px">▶ Play animation + piano</button> <button id="estop">■ Stop</button> <label>Or your own SVS video <input type="file" id="efile" accept="video/*"></label></div>
+<div class="bar" aria-hidden="true" style="height:8px;background:#8884;border-radius:4px;overflow:hidden"><i id="ebar" style="display:block;height:100%;width:0;background:#1565c0"></i></div>
+<p id="einfo" class="mut" role="status" aria-live="polite"></p>
+<p id="esrc" class="mut"></p>
+</section>
 
 <section id="story" class="card" aria-labelledby="h_story">
-<h2 id="h_story" data-i="h_story">1. The guided listen (about 1 minute)</h2>
+<h2 id="h_story" data-i="h_story">2. Arctic sea ice: the guided listen (about 1 minute)</h2>
 <div id="vis"><figure id="mapfig" tabindex="0" role="application" aria-label="Sea ice map. Arrow keys move the cursor, S scans the row." style="margin:8px 0;text-align:center;outline-offset:4px"><div id="mapwrap" style="position:relative;display:inline-block;line-height:0"><img id="map" alt="" style="max-width:100%;max-height:340px;border-radius:10px;background:#fff;touch-action:none"><div id="mcur" style="position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border:3px solid #ff2d95;border-radius:50%;pointer-events:none;box-shadow:0 0 0 2px #fff"></div></div><figcaption class="mut" style="font-size:14px">NSIDC Sea Ice Index v4.0 (NOAA@NSIDC): September ice extent map</figcaption></figure>
 <p class="mut" id="maphelp" data-i="maphelp" style="font-size:14px">Touch the map, or focus it and use the arrow keys: a high piano note means ice, a low note means open water, silence means land. Press S to scan the current row left to right.</p><p id="minfo" class="mut" role="status" aria-live="polite"></p>
 <svg id="chart" viewBox="0 0 600 220" role="img" aria-label="Line chart of the chosen data over the years"></svg>
@@ -44,7 +55,7 @@ input[type=range]{width:100%;height:36px}.big{font-size:36px;font-weight:800;lin
 </section>
 
 <section class="card" aria-labelledby="h_ab">
-<h2 id="h_ab" data-i="h_ab">2. Same phrase, two years</h2>
+<h2 id="h_ab" data-i="h_ab">3. Same phrase, two years</h2>
 <p class="mut" data-i="ab_p">Plays the same 8 seconds of music twice. Only the data changes, so every difference you hear comes from the ice.</p>
 <div class="row"><label><span data-i="ya">Year A</span>&nbsp;<select id="ya"></select></label><label><span data-i="yb">Year B</span>&nbsp;<select id="yb"></select></label></div>
 <div class="row"><button id="pa" class="go" style="width:auto;font-size:18px;padding:12px 22px">▶ A</button><button id="pb" class="go" style="width:auto;font-size:18px;padding:12px 22px">▶ B</button><button id="pab" data-i="pab">A then B</button></div>
@@ -52,19 +63,10 @@ input[type=range]{width:100%;height:36px}.big{font-size:36px;font-weight:800;lin
 </section>
 
 
-<section id="eicsec" class="card" aria-labelledby="h_eic">
-<h2 id="h_eic">NASA EIC animations → live piano</h2>
-<p class="mut"><b>Purpose:</b> test whether people can <i>hear</i> a real NASA Earth Information Center (SVS) animation change. Technique: the animation is read pixel by pixel in the browser. <b>Sweep</b> mode scans each frame west→east in 8 strips every 2 seconds: each strip becomes one note (more of the feature = higher, louder; none = silence), so you hear <i>where</i> things are. <b>Whole frame</b> mode uses the whole frame's share of the feature to decide how many notes of a public-domain Debussy piece play. The feature is hand-picked for each animation (ice → white, fires and temperature → warm colours, vegetation and rain → green, smoke and carbon monoxide → deep red; logos, dates and colour legends are masked out); for other animations and your own videos it is the feature that changes most, and you can always choose it yourself.</p>
-<div class="row"><label>Animation <select id="evid"></select></label> <label>Mode <select id="emode"><option value="sweep">Sweep across the map (melody = where it is)</option><option value="whole">Whole frame (piano fullness = how much)</option></select></label> <label>Piano follows <select id="efeat"><option value="auto">best match (automatic)</option><option value="white">white / ice / cloud</option><option value="cool">blue / water</option><option value="warm">warm colour</option><option value="green">green / vegetation / rain</option><option value="red">deep red / high concentration</option><option value="bright">brightness</option><option value="edge">detail</option></select></label></div>
-<video id="ev" muted loop playsinline controls style="width:100%;border-radius:8px;background:#000" aria-label="NASA animation"></video>
-<div class="row"><button id="eplay" style="font-size:18px;padding:12px 22px">▶ Play animation + piano</button> <button id="estop">■ Stop</button> <label>Or your own SVS video <input type="file" id="efile" accept="video/*"></label></div>
-<div class="bar" aria-hidden="true" style="height:8px;background:#8884;border-radius:4px;overflow:hidden"><i id="ebar" style="display:block;height:100%;width:0;background:#1565c0"></i></div>
-<p id="einfo" class="mut" role="status" aria-live="polite"></p>
-<p id="esrc" class="mut"></p>
-</section>
+
 
 <section class="card" aria-labelledby="h_two">
-<h2 id="h_two" data-i="h_two">2b. Same year, two measurements</h2>
+<h2 id="h_two" data-i="h_two">3b. Same year, two measurements</h2>
 <p class="mut" data-i="two_p">Pick one year and two kinds of data. The same 8 seconds of music play for each, thinned by its own number. Note that for temperature and CO₂, a bigger number means more piano.</p>
 <div class="row"><label><span data-i="two_y">Year</span>&nbsp;<select id="ty"></select></label><label><span data-i="two_x">First</span>&nbsp;<select id="tx"></select></label><label><span data-i="two_z">Second</span>&nbsp;<select id="tz"></select></label></div>
 <div class="row"><button id="tp1" class="go" style="width:auto;font-size:18px;padding:12px 22px">▶ 1</button><button id="tp2" class="go" style="width:auto;font-size:18px;padding:12px 22px">▶ 2</button><button id="tp12" data-i="tpab">First then second</button></div>
@@ -72,7 +74,7 @@ input[type=range]{width:100%;height:36px}.big{font-size:36px;font-weight:800;lin
 </section>
 
 <section class="card" aria-labelledby="h_ex">
-<h2 id="h_ex" data-i="h_ex">3. Explore the years</h2>
+<h2 id="h_ex" data-i="h_ex">4. Explore the years</h2>
 <label for="yr" data-i="yr">Year</label>
 <input type="range" id="yr" min="1979" max="2026" value="1979">
 
@@ -87,10 +89,7 @@ input[type=range]{width:100%;height:36px}.big{font-size:36px;font-weight:800;lin
 <p class="mut" data-i="piece_note">The piece is provisional and can be swapped; the data rules stay the same.</p>
 </section>
 
-<section class="card" aria-labelledby="h_more">
-<h2 id="h_more" data-i="h_more">More NASA visualizations</h2>
-<p><a href="#eicsec" data-i="more_a">Try 17 other NASA EIC animations (auto-generated, not curated)</a></p>
-</section>
+
 
 <section class="card" aria-labelledby="h_how">
 <h2 id="h_how" data-i="h_how">How it works, and what it can and cannot say</h2>
@@ -104,7 +103,7 @@ input[type=range]{width:100%;height:36px}.big{font-size:36px;font-weight:800;lin
 <script src="../vendor/Midi.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-const L={en:{},zh:{skip:"跳到收听体验",h1:"听 48 个九月的北极海冰",sub:"一首钢琴曲，每年一个数字。冰越少，钢琴越薄。请戴耳机，并关掉手机静音开关。",h_story:"1. 引导收听（约 1 分钟）",guided:"▶ 点击收听",stop:"■ 停止",narr:"解说",vib:"震动（安卓）",h_ab:"2. 同一句乐句，两个年份",ab_p:"把同样的 8 秒音乐播放两次。只有数据不同，所以你听到的每一处差别都来自海冰。",ya:"年份 A",yb:"年份 B",pab:"先 A 后 B",tpab:"先第一个后第二个",maphelp:"触摸地图，或点一下再用方向键移动：高音钢琴音 = 海冰，低音 = 海面，没有声音 = 陆地。按 S 把当前这一行从左到右扫一遍。",h_two:"2b. 同一年，两种数据",two_p:"选一年和两种数据。同样的 8 秒音乐各放一遍，各按自己的数值变薄。注意：气温和二氧化碳是数值越大钢琴越多。",two_y:"年份",two_x:"第一个",two_z:"第二个",h_ex:"3. 逐年探索",yr:"年份",say:"读出这一年的数据",why:"为什么听起来是这样？",sweep:"▶ 播放 1979 → 2026",keys:"键盘：← → 换年份，A / B 播放两个年份，空格开始或停止引导收听。",h_set:"设置",piece:"曲目",thin:"数据抽薄钢琴",h_ds:"选择数据",ds:"数据集",ds_p:"上面的引导收听固定用北极海冰。第 2、3 部分用这里选的数据集。规则都一样：被测的东西越多，钢琴演奏得越多。",eq:"等响度（听到变薄，而不是变小声）",dv:"数据音（音高 = 数值）",piece_note:"曲目是暂定的，可以更换，数据规则不变。",h_more:"更多 NASA 可视化",more_a:"试试另外 17 个 NASA EIC 动画（自动生成，未精修）",h_how:"原理，以及它能说什么、不能说什么",s1:"规则",s2:"数据能说明什么",s3:"哪些来自数据，哪些来自德布西",s4:"来源、许可、AI 使用",
+const L={en:{},zh:{skip:"跳到收听体验",h1:"听地球",sub:"选一段 NASA 地球信息中心（EIC）的动画来听：画面逐像素读出来，用钢琴弹出来。还可以摸海冰地图，听 48 个九月的北极海冰。请戴耳机，并关掉手机静音开关。",h_eic:"1. NASA EIC 点唱机：选一段动画来听",h_story:"2. 北极海冰：引导收听（约 1 分钟）",guided:"▶ 点击收听",stop:"■ 停止",narr:"解说",vib:"震动（安卓）",h_ab:"3. 同一句乐句，两个年份",ab_p:"把同样的 8 秒音乐播放两次。只有数据不同，所以你听到的每一处差别都来自海冰。",ya:"年份 A",yb:"年份 B",pab:"先 A 后 B",tpab:"先第一个后第二个",maphelp:"触摸地图，或点一下再用方向键移动：高音钢琴音 = 海冰，低音 = 海面，没有声音 = 陆地。按 S 把当前这一行从左到右扫一遍。",h_two:"3b. 同一年，两种数据",two_p:"选一年和两种数据。同样的 8 秒音乐各放一遍，各按自己的数值变薄。注意：气温和二氧化碳是数值越大钢琴越多。",two_y:"年份",two_x:"第一个",two_z:"第二个",h_ex:"4. 逐年探索",yr:"年份",say:"读出这一年的数据",why:"为什么听起来是这样？",sweep:"▶ 播放 1979 → 2026",keys:"键盘：← → 换年份，A / B 播放两个年份，空格开始或停止引导收听。",h_set:"设置",piece:"曲目",thin:"数据抽薄钢琴",h_ds:"选择数据",ds:"数据集",ds_p:"上面的引导收听固定用北极海冰。第 2、3 部分用这里选的数据集。规则都一样：被测的东西越多，钢琴演奏得越多。",eq:"等响度（听到变薄，而不是变小声）",dv:"数据音（音高 = 数值）",piece_note:"曲目是暂定的，可以更换，数据规则不变。",h_more:"更多 NASA 可视化",more_a:"试试另外 17 个 NASA EIC 动画（自动生成，未精修）",h_how:"原理，以及它能说什么、不能说什么",s1:"规则",s2:"数据能说明什么",s3:"哪些来自数据，哪些来自德布西",s4:"来源、许可、AI 使用",
 r1:"9 月北极海冰范围（百万平方公里）决定钢琴演奏多少。标尺固定为 3 到 8，不自动缩放。达到 5% 时出现最高旋律线，达到 30% 加入低音，再往上内声部逐个回来。另有一个正弦音，用同一个数值在固定的 D 多利亚音阶（D4–D6）上取音高：越高冰越多。解说只降低音乐音量，不改变演奏哪些音，所以不会被当成数据。",
 r2:"每年一个值，永远是 9 月，所以这是长期比较，不是季节循环。它显示 1979 年以来的下降，年际波动很大（这份记录中最低是 2012 年，357 万平方公里，比 1981–2010 平均值 641 万低 44%）。它不说明原因，单个年份也可能反弹。",
 r3:"音符、音高、节奏属于德布西。数据决定其中哪些音被演奏，另有一个由数据生成的正弦音。我们不声称每个音都来自 NASA 数据。",
@@ -126,7 +125,7 @@ function ratio(a){let all=0,kept=0;for(const n of notes){const e=n.v*n.v;all+=e;
 function eqGain(a){return $("eq").checked?Math.min(3.5,1/Math.sqrt(ratio(a))):1}
 async function ensure(){await Tone.start();
  if(loadedMid!==$("mid").value){notes=buildNotes(await Midi.fromUrl($("mid").value));loadedMid=$("mid").value}
- if(sampler)return;const lim=new Tone.Limiter(-3).toDestination(),rev=new Tone.Reverb({decay:3,wet:0.25}).connect(lim);await rev.generate();
+ if(sampler){await Tone.loaded();return}const lim=new Tone.Limiter(-3).toDestination(),rev=new Tone.Reverb({decay:3,wet:0.25}).connect(lim);await rev.generate();
  mus=new Tone.Gain(1).connect(rev);comp=new Tone.Gain(1).connect(mus);
  sampler=new Tone.Sampler({urls:{A1:"A1.mp3",A2:"A2.mp3",A3:"A3.mp3",A4:"A4.mp3",A5:"A5.mp3",A6:"A6.mp3",C2:"C2.mp3",C3:"C3.mp3",C4:"C4.mp3",C5:"C5.mp3",C6:"C6.mp3","D#3":"Ds3.mp3","D#4":"Ds4.mp3","D#5":"Ds5.mp3","F#3":"Fs3.mp3","F#4":"Fs4.mp3","F#5":"Fs5.mp3"},baseUrl:"../vendor/salamander/",release:1}).connect(comp);
  await Tone.loaded();dsyn=new Tone.Synth({oscillator:{type:"sine"},envelope:{attack:0.05,decay:0.2,sustain:0.3,release:1.2},volume:-14}).connect(rev)}
@@ -216,23 +215,23 @@ load();
 
 // ---- NASA EIC animation -> piano (features precomputed per second from the SVS video; own files computed live on canvas)
 let EV={},EK=[],eTimer=null,ePos=0,eLive=null,eMM={},eSay=0;
-const EFEAT=["white","cool","warm","bright","sat","edge"],ENAME={red:"deep red / high concentration",white:"white / ice / cloud",cool:"blue / water",warm:"warm colour",green:"green / vegetation",bright:"brightness",sat:"colour strength",edge:"detail"};
+const EFEAT=["white","cool","warm","bright","sat","edge"],ENAME={dots:"small lit dots (city lights, lightning)",red:"deep red / high concentration",orange:"orange (warm water, CO₂ plumes)",white:"white / ice / cloud",cool:"blue / water",warm:"warm colour",green:"green colour",bright:"brightness",sat:"colour strength",edge:"detail"};
 // hand-picked feature per animation (what the colour actually means in that SVS visual); others fall back to the automatic choice
-const EPICK={arctic_ice:"white",antarctic_ice:"white",polar_ice:"white",precip_cloud:"green",fires:"warm",sst:"warm",sst_anom:"warm",air_temp:"warm",ndvi:"green",pm25:"red",co:"red",humidity:"cool",wind:"white"};
+const EPICK={arctic_ice:"white",antarctic_ice:"white",polar_ice:"white",precip_cloud:"green",fires:"warm",sst:"warm",sst_anom:"warm",air_temp:"warm",ndvi:"green",pm25:"red",co:"red",humidity:"cool",wind:"white",night_lights:"dots",dyamond_co2:"warm",perpetual_ocean:"orange",atmos_river:"cool",aerosols:"green",gedi:"green",air_quality:"red",lightning:"dots"};
 // legends, logos and date labels are not data: these rectangles (fractions of the frame: x0,y0,x1,y1) are ignored
 const GEOSM=[[0,0,0.2,0.1],[0,0.9,0.3,1]];
-const EMASK={fires:[[0,0.8,0.3,1]],air_temp:GEOSM,wind:GEOSM,precip_cloud:GEOSM,humidity:GEOSM,pm25:GEOSM,o3:GEOSM,co:GEOSM,no2:GEOSM,sst_anom:[[0,0.9,0.15,1]],gpm_rain:[[0.55,0.85,1,1],[0,0.88,0.2,1]],antarctic_ice:[[0,0,0.35,0.12]],polar_ice:[[0.3,0,0.7,0.12]]};
-const CW=192,CH=96;let eMask=[];const masked=(x,y)=>eMask.some(([a,b,c,d])=>x>=a*CW&&x<c*CW&&y>=b*CH&&y<d*CH);
-const pxF=(f,r,g,b)=>{const mx=Math.max(r,g,b),mn=Math.min(r,g,b);return f==="white"?+(r>200&&g>200&&b>200):f==="cool"?+(b>r+30&&b>90):f==="warm"?+(r>b+30&&r>120):f==="green"?+(g>r+20&&g>b+10&&g>80):f==="red"?+(r>140&&g<100&&b<90):f==="sat"?(mx?(mx-mn)/mx:0):(r+g+b)/765};
+const EMASK={fires:[[0,0.8,0.3,1]],air_temp:GEOSM,wind:GEOSM,precip_cloud:GEOSM,humidity:GEOSM,pm25:GEOSM,o3:GEOSM,co:GEOSM,no2:GEOSM,sst_anom:[[0,0.9,0.15,1]],gpm_rain:[[0.55,0.85,1,1],[0,0.88,0.2,1]],antarctic_ice:[[0,0,0.35,0.12]],polar_ice:[[0.3,0,0.7,0.12]],dyamond_co2:[[0.8,0.9,1,1]],gedi:[[0,0.7,0.3,0.92]],lightning:[[0.35,0.88,0.65,1]],night_lights:[[0.47,0.48,0.58,0.62]]};
+const CW=384,CH=192;let eMask=[];const masked=(x,y)=>eMask.some(([a,b,c,d])=>x>=a*CW&&x<c*CW&&y>=b*CH&&y<d*CH);
+const pxF=(f,r,g,b)=>{const mx=Math.max(r,g,b),mn=Math.min(r,g,b);return f==="white"?+(r>200&&g>200&&b>200):f==="cool"?+(b>r+30&&b>90):f==="warm"?+(r>b+30&&r>120):f==="green"?+(g>r+20&&g>b+10&&g>80):f==="red"?+(r>140&&g<100&&b<90):f==="orange"?+(r>120&&r-g>30&&r-b>60):f==="dots"?+(r>50&&r-b>15):f==="sat"?(mx?(mx-mn)/mx:0):(r+g+b)/765};
 // automatic choice = the feature whose share of the frame changes the most over the animation (absolute change, so tiny specks don't win)
 function eBest(d){let best="white",bv=-1;for(const f of EFEAT){const a=d.steps.map(x=>x[f]),v=Math.max(...a)-Math.min(...a);if(v>bv){bv=v;best=f}}return best}
 // honest scale: the busiest frame = full piano; a change smaller than 30% of the peak never swings the piano from empty to full
 function eRange(lo,hi){if(!(hi>1e-4))return [0,1];const span=Math.max(hi-lo,0.3*hi);return [hi-span,hi]}
-async function eicLoad(){try{EK=await (await fetch("eic/index.json")).json();for(const k of EK){EV[k]=await (await fetch("eic/"+k+".json")).json();const o=document.createElement("option");o.value=k;o.textContent=EV[k].en+" (SVS "+EV[k].svs+")";$("evid").appendChild(o)}
+async function eicLoad(){try{EK=await (await fetch("eic/index.json")).json();for(const k of EK){EV[k]=await (await fetch("eic/"+k+".json")).json();const o=document.createElement("option");o.value=k;o.textContent=(EV[k].official?"★ ":"")+EV[k].en+" (SVS "+EV[k].svs+")";$("evid").appendChild(o)}
  $("evid").onchange=ePick;$("efeat").onchange=ePick;$("emode").onchange=()=>{eSmm={}};ePick()}catch(e){$("einfo").textContent="Animations could not be loaded."}}
 function ePick(){eStop();eLive=null;const d=EV[$("evid").value];if(!d)return;$("ev").src="eic/"+d.key+".mp4";$("ev").muted=true;eMM={};
  const f=$("efeat").value==="auto"?(EPICK[d.key]||eBest(d)):$("efeat").value;eMM.f=f;eMask=EMASK[d.key]||[];eLive=mkLive();
- $("esrc").innerHTML='Source: <a href="'+d.source+'" target="_blank" rel="noopener">NASA Scientific Visualization Studio, SVS '+d.svs+' — '+d.en+'</a> (public domain, used in the Earth Information Center).'}
+ $("esrc").innerHTML='Source: <a href="'+d.source+'" target="_blank" rel="noopener">NASA Scientific Visualization Studio, SVS '+d.svs+' — '+d.en+'</a> (public domain, used in the Earth Information Center)'+(d.official?' — <b>★ named in the challenge\'s official NASA resources</b>.':'.')}
 function eAmt(){const v=$("ev"),d=EV[$("evid").value];let x;
  if(eLive){x=eLive.read(v);eMM.rlo=Math.min(eMM.rlo??x,x);eMM.rhi=Math.max(eMM.rhi??x,x);[eMM.lo,eMM.hi]=eRange(eMM.rlo,eMM.rhi)}
  else{const i=Math.min(d.steps.length-1,Math.floor(v.currentTime/d.step));x=d.steps[i][eMM.f]}

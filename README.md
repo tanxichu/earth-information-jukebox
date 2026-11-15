@@ -7,11 +7,13 @@ Live site: https://tanxichu.github.io/earth-information-jukebox/
 NASA Earth Information Center (EIC) visualizations, made by the NASA Scientific Visualization Studio (SVS), are turned
 into sound in the browser, so blind and low-vision people can explore them and anyone can hear the planet change.
 
-* **NASA EIC animations → live piano.** 17 SVS animations, read live from the playing video (192×96 pixels every 2 s).
+* **NASA EIC animations → live piano.** 25 SVS animations (8 of them named in the challenge resources: night lights, DYAMOND CO₂,
+  Perpetual Ocean 2, atmospheric river, GEOS aerosols, GEDI forest height, air-quality model runs, ISS lightning),
+  read live from the playing video (384×192 pixels every 2 s).
   *Sweep* mode cuts each frame into 8 strips west→east: one note per strip, more of the feature = higher, louder note;
   none = silence. *Whole frame* mode lets the frame's share of the feature decide how many notes of a public-domain
   Debussy piece play. The feature is chosen per animation from what its colours mean (ice = white, fires and heat = warm,
-  vegetation and rain = green, smoke and CO = deep red); logos, dates and colour legends are masked out.
+  vegetation and rain = green, smoke and CO = deep red, city lights and lightning = small lit dots); logos, dates and colour legends are masked out.
   Any SVS video can be dropped in and is analysed the same way.
 * 30-second demo video: `demo/demo.mp4`.
 * **Touch the map.** Point at the sea-ice map (mouse, touch or arrow keys): ice = high note, open water = low note,
