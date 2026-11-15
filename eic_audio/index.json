@@ -1,0 +1,30 @@
+{
+ "tracks": [
+  {
+   "id": "P6_v12",
+   "name": "Rhythm (listeners' choice)",
+   "description": "A groove where each beat of the bar is one west-to-east strip of the map; more = more and louder hits."
+  },
+  {
+   "id": "P7_h4a",
+   "name": "Hybrid: voices + piano + groove",
+   "description": "Eight west-to-east voices carry the data; piano and a light groove underneath."
+  },
+  {
+   "id": "P3_v8_motif",
+   "name": "Ambient voices",
+   "description": "Continuous panned voices, west = left, east = right; louder and brighter = more."
+  },
+  {
+   "id": "P5_r3_cleanS2",
+   "name": "AI music (ACE-Step)",
+   "description": "Music generated with ACE-Step (Apache-2.0), mixed so loudness and left/right follow the data. Pre-rendered."
+  },
+  {
+   "id": "P4_v7_pad",
+   "name": "Nature sounds",
+   "description": "Sounds of what is shown (ice, fire, water, lights) over a soft chord pad."
+  }
+ ],
+ "default": "P6_v12"
+}

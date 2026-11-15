@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Engine harness</title><link rel="icon" href="data:,"></head>
+<body><p id="st">loading…</p>
+<script type="module">
+// Offline benchmark harness: renders engine <ID> on the 12 benchmark clips and stores 16-bit stereo WAVs (base64) in window.RESULT.
+const q = new URLSearchParams(location.search), ID = q.get("engine"), SET = q.get("set") || "main", NOMETA = q.get("nometa") === "1", PRESCAN = q.get("prescan") === "1", SR = 44100;   // prescan=1: like the page for a user video: ranges from 24 evenly spaced frames of the clip itself, no key   // nometa=1: like a user's own video (no key, ranges or stats)
+const st = document.getElementById("st");
+function wav16(buf) {
+  const n = buf.length, L = buf.getChannelData(0), R = buf.numberOfChannels > 1 ? buf.getChannelData(1) : L;
+  const ab = new ArrayBuffer(44 + n * 4), v = new DataView(ab); let o = 0;
+  const s = t => { for (const c of t) v.setUint8(o++, c.charCodeAt(0)); }, u32 = x => { v.setUint32(o, x, true); o += 4; }, u16 = x => { v.setUint16(o, x, true); o += 2; };
+  s("RIFF"); u32(36 + n * 4); s("WAVEfmt "); u32(16); u16(1); u16(2); u32(SR); u32(SR * 4); u16(4); u16(16); s("data"); u32(n * 4);
+  for (let i = 0; i < n; i++) { for (const x of [L[i], R[i]]) { const y = Math.max(-1, Math.min(1, x)); v.setInt16(o, y < 0 ? y * 32768 : y * 32767, true); o += 2; } }
+  const u = new Uint8Array(ab); let b = ""; for (let i = 0; i < u.length; i += 0x8000) b += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(b);
+}
+(async () => {
+  try {
+    const mod = await import(`./${ID}.js?v=${Date.now()}`);
+    const keys = await (await fetch(`benchdata/${SET}/index.json`)).json(); const out = {}, peaks = {};
+    for (const k of keys) {
+      const d = await (await fetch(`benchdata/${SET}/${k}.json`)).json();
+      const ctx = new OfflineAudioContext(2, Math.round(d.duration * SR), SR);
+      let pre = null;
+      if (PRESCAN) { const n = d.whole.length, idx = [...Array(24)].map((_, k) => Math.min(n - 1, Math.floor(n * (k + 0.5) / 24)));
+        const W = idx.map(i => d.whole[i]), S = idx.flatMap(i => d.strips[i]), pct = (a, q) => { const b = [...a].sort((x, y) => x - y); return b[Math.min(b.length - 1, Math.floor(q / 100 * (b.length - 1)))]; };
+        const wr = [pct(W, 2), pct(W, 90)], sr = [pct(S, 2), pct(S, 90)], nz = (x, [a, b]) => Math.max(0, Math.min(1, (x - a) / Math.max(b - a, 1e-9)));
+        pre = { feature: d.feature, whole_range: wr, strip_range: sr, anim_stats: { whole_mean: W.reduce((a, x) => a + nz(x, wr), 0) / W.length, strip_mean: S.reduce((a, x) => a + nz(x, sr), 0) / S.length }, fps: d.fps, baseUrl: new URL("../", location.href).href }; }
+      const eng = await mod.createEngine(ctx, pre ? pre : NOMETA ? { feature: d.feature, fps: d.fps, baseUrl: new URL("../", location.href).href } : { key: d.key, feature: d.feature, whole_range: d.whole_range, strip_range: d.strip_range, anim_stats: d.anim_stats, fps: d.fps, baseUrl: new URL("../", location.href).href });
+      for (let t = 0; t < d.whole.length; t++) eng.frame(t / d.fps, d.strips[t], d.whole[t]);
+      const buf = await ctx.startRendering(); out[k] = wav16(buf);
+      let pk = 0; for (let c = 0; c < buf.numberOfChannels; c++) for (const x of buf.getChannelData(c)) pk = Math.max(pk, Math.abs(x)); peaks[k] = pk;
+      st.textContent = `rendered ${Object.keys(out).length}/${keys.length}`;
+    }
+    window.RESULT = { ok: true, wavs: out, peaks, meta: mod.meta };
+  } catch (e) { window.RESULT = { ok: false, error: String(e && e.stack || e) }; }
+  st.textContent = "done";
+})();
+</script></body></html>
