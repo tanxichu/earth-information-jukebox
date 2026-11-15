@@ -7,9 +7,13 @@ Live site: https://tanxichu.github.io/earth-information-jukebox/
 NASA Earth Information Center (EIC) visualizations, made by the NASA Scientific Visualization Studio (SVS), are turned
 into sound in the browser, so blind and low-vision people can explore them and anyone can hear the planet change.
 
-* **NASA EIC animations → live piano.** 17 SVS animations. *Sweep* mode reads each frame west→east in 8 strips
-  (more of the feature = higher, louder note; none = silence). *Whole frame* mode lets the frame's share of the feature
-  decide how many notes of a public-domain Debussy piece play. Any SVS video can be dropped in and is analysed live.
+* **NASA EIC animations → live piano.** 17 SVS animations, read live from the playing video (192×96 pixels every 2 s).
+  *Sweep* mode cuts each frame into 8 strips west→east: one note per strip, more of the feature = higher, louder note;
+  none = silence. *Whole frame* mode lets the frame's share of the feature decide how many notes of a public-domain
+  Debussy piece play. The feature is chosen per animation from what its colours mean (ice = white, fires and heat = warm,
+  vegetation and rain = green, smoke and CO = deep red); logos, dates and colour legends are masked out.
+  Any SVS video can be dropped in and is analysed the same way.
+* 30-second demo video: `demo/demo.mp4`.
 * **Touch the map.** Point at the sea-ice map (mouse, touch or arrow keys): ice = high note, open water = low note,
   land = silence; `S` sweeps the row.
 * **Guided listen** of September Arctic sea ice 1979–2026 with narration, A/B years, two measurements in one year.
@@ -17,6 +21,9 @@ into sound in the browser, so blind and low-vision people can explore them and a
 
 ## Run locally
 Any static web server, e.g. `python3 -m http.server` in this folder, then open `/product/`.
+
+## Tests
+Headless-browser checks (Playwright) live in the development repo: page errors, every control, sweep notes per animation, no horizontal scrolling at 320/375 px.
 
 ## Sources and licences
 * Visualizations: NASA Scientific Visualization Studio, public domain (SVS IDs are listed on the page next to each animation).

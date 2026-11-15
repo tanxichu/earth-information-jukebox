@@ -54,8 +54,8 @@ input[type=range]{width:100%;height:36px}.big{font-size:36px;font-weight:800;lin
 
 <section id="eicsec" class="card" aria-labelledby="h_eic">
 <h2 id="h_eic">NASA EIC animations → live piano</h2>
-<p class="mut"><b>Purpose:</b> test whether people can <i>hear</i> a real NASA Earth Information Center (SVS) animation change. Technique: the animation is read pixel by pixel in the browser. <b>Sweep</b> mode scans each frame west→east in 8 strips every 2 seconds: each strip becomes one note (more of the feature = higher, louder; none = silence), so you hear <i>where</i> things are. <b>Whole frame</b> mode uses the whole frame's share of the feature to decide how many notes of a public-domain Debussy piece play. The feature is picked automatically as the one that changes most in that animation, or you choose it.</p>
-<div class="row"><label>Animation <select id="evid"></select></label> <label>Mode <select id="emode"><option value="sweep">Sweep across the map (melody = where it is)</option><option value="whole">Whole frame (piano fullness = how much)</option></select></label> <label>Piano follows <select id="efeat"><option value="auto">best match (automatic)</option><option value="white">white / ice / cloud</option><option value="cool">blue / water</option><option value="warm">warm colour</option><option value="bright">brightness</option><option value="edge">detail</option></select></label></div>
+<p class="mut"><b>Purpose:</b> test whether people can <i>hear</i> a real NASA Earth Information Center (SVS) animation change. Technique: the animation is read pixel by pixel in the browser. <b>Sweep</b> mode scans each frame west→east in 8 strips every 2 seconds: each strip becomes one note (more of the feature = higher, louder; none = silence), so you hear <i>where</i> things are. <b>Whole frame</b> mode uses the whole frame's share of the feature to decide how many notes of a public-domain Debussy piece play. The feature is hand-picked for each animation (ice → white, fires and temperature → warm colours, vegetation and rain → green, smoke and carbon monoxide → deep red; logos, dates and colour legends are masked out); for other animations and your own videos it is the feature that changes most, and you can always choose it yourself.</p>
+<div class="row"><label>Animation <select id="evid"></select></label> <label>Mode <select id="emode"><option value="sweep">Sweep across the map (melody = where it is)</option><option value="whole">Whole frame (piano fullness = how much)</option></select></label> <label>Piano follows <select id="efeat"><option value="auto">best match (automatic)</option><option value="white">white / ice / cloud</option><option value="cool">blue / water</option><option value="warm">warm colour</option><option value="green">green / vegetation / rain</option><option value="red">deep red / high concentration</option><option value="bright">brightness</option><option value="edge">detail</option></select></label></div>
 <video id="ev" muted loop playsinline controls style="width:100%;border-radius:8px;background:#000" aria-label="NASA animation"></video>
 <div class="row"><button id="eplay" style="font-size:18px;padding:12px 22px">▶ Play animation + piano</button> <button id="estop">■ Stop</button> <label>Or your own SVS video <input type="file" id="efile" accept="video/*"></label></div>
 <div class="bar" aria-hidden="true" style="height:8px;background:#8884;border-radius:4px;overflow:hidden"><i id="ebar" style="display:block;height:100%;width:0;background:#1565c0"></i></div>
@@ -216,29 +216,33 @@ load();
 
 // ---- NASA EIC animation -> piano (features precomputed per second from the SVS video; own files computed live on canvas)
 let EV={},EK=[],eTimer=null,ePos=0,eLive=null,eMM={},eSay=0;
-const EFEAT=["white","cool","warm","bright","sat","edge"],ENAME={white:"white / ice / cloud",cool:"blue / water",warm:"warm colour",bright:"brightness",sat:"colour strength",edge:"detail"};
+const EFEAT=["white","cool","warm","bright","sat","edge"],ENAME={red:"deep red / high concentration",white:"white / ice / cloud",cool:"blue / water",warm:"warm colour",green:"green / vegetation",bright:"brightness",sat:"colour strength",edge:"detail"};
+// hand-picked feature per animation (what the colour actually means in that SVS visual); others fall back to the automatic choice
+const EPICK={arctic_ice:"white",antarctic_ice:"white",polar_ice:"white",precip_cloud:"green",fires:"warm",sst:"warm",sst_anom:"warm",air_temp:"warm",ndvi:"green",pm25:"red",co:"red",humidity:"cool",wind:"white"};
+// legends, logos and date labels are not data: these rectangles (fractions of the frame: x0,y0,x1,y1) are ignored
+const GEOSM=[[0,0,0.2,0.1],[0,0.9,0.3,1]];
+const EMASK={fires:[[0,0.8,0.3,1]],air_temp:GEOSM,wind:GEOSM,precip_cloud:GEOSM,humidity:GEOSM,pm25:GEOSM,o3:GEOSM,co:GEOSM,no2:GEOSM,sst_anom:[[0,0.9,0.15,1]],gpm_rain:[[0.55,0.85,1,1],[0,0.88,0.2,1]],antarctic_ice:[[0,0,0.35,0.12]],polar_ice:[[0.3,0,0.7,0.12]]};
+const CW=192,CH=96;let eMask=[];const masked=(x,y)=>eMask.some(([a,b,c,d])=>x>=a*CW&&x<c*CW&&y>=b*CH&&y<d*CH);
+const pxF=(f,r,g,b)=>{const mx=Math.max(r,g,b),mn=Math.min(r,g,b);return f==="white"?+(r>200&&g>200&&b>200):f==="cool"?+(b>r+30&&b>90):f==="warm"?+(r>b+30&&r>120):f==="green"?+(g>r+20&&g>b+10&&g>80):f==="red"?+(r>140&&g<100&&b<90):f==="sat"?(mx?(mx-mn)/mx:0):(r+g+b)/765};
 // automatic choice = the feature whose share of the frame changes the most over the animation (absolute change, so tiny specks don't win)
 function eBest(d){let best="white",bv=-1;for(const f of EFEAT){const a=d.steps.map(x=>x[f]),v=Math.max(...a)-Math.min(...a);if(v>bv){bv=v;best=f}}return best}
 // honest scale: the busiest frame = full piano; a change smaller than 30% of the peak never swings the piano from empty to full
-function eRange(lo,hi){const span=Math.max(hi-lo,0.3*hi,1e-6);return [hi-span,hi]}
+function eRange(lo,hi){if(!(hi>1e-4))return [0,1];const span=Math.max(hi-lo,0.3*hi);return [hi-span,hi]}
 async function eicLoad(){try{EK=await (await fetch("eic/index.json")).json();for(const k of EK){EV[k]=await (await fetch("eic/"+k+".json")).json();const o=document.createElement("option");o.value=k;o.textContent=EV[k].en+" (SVS "+EV[k].svs+")";$("evid").appendChild(o)}
  $("evid").onchange=ePick;$("efeat").onchange=ePick;$("emode").onchange=()=>{eSmm={}};ePick()}catch(e){$("einfo").textContent="Animations could not be loaded."}}
 function ePick(){eStop();eLive=null;const d=EV[$("evid").value];if(!d)return;$("ev").src="eic/"+d.key+".mp4";$("ev").muted=true;eMM={};
- const f=$("efeat").value==="auto"?eBest(d):$("efeat").value;eMM.f=f;const a=d.steps.map(x=>x[f]);eMM.rlo=Math.min(...a);eMM.rhi=Math.max(...a);[eMM.lo,eMM.hi]=eRange(eMM.rlo,eMM.rhi);
+ const f=$("efeat").value==="auto"?(EPICK[d.key]||eBest(d)):$("efeat").value;eMM.f=f;eMask=EMASK[d.key]||[];eLive=mkLive();
  $("esrc").innerHTML='Source: <a href="'+d.source+'" target="_blank" rel="noopener">NASA Scientific Visualization Studio, SVS '+d.svs+' — '+d.en+'</a> (public domain, used in the Earth Information Center).'}
 function eAmt(){const v=$("ev"),d=EV[$("evid").value];let x;
  if(eLive){x=eLive.read(v);eMM.rlo=Math.min(eMM.rlo??x,x);eMM.rhi=Math.max(eMM.rhi??x,x);[eMM.lo,eMM.hi]=eRange(eMM.rlo,eMM.rhi)}
  else{const i=Math.min(d.steps.length-1,Math.floor(v.currentTime/d.step));x=d.steps[i][eMM.f]}
  eMM.x=x;return eMM.hi>eMM.lo+1e-6?Math.max(0,Math.min(1,(x-eMM.lo)/(eMM.hi-eMM.lo))):0.5}
-function mkLive(){const c=document.createElement("canvas");c.width=64;c.height=32;const g=c.getContext("2d",{willReadFrequently:true});
- return{read(v){try{g.drawImage(v,0,0,64,32);const p=g.getImageData(0,0,64,32).data;let n=0,w=0,cl=0,wm=0,b=0;for(let i=0;i<p.length;i+=4){const r=p[i],gg=p[i+1],bl=p[i+2];n++;b+=(r+gg+bl)/765;if(r>200&&gg>200&&bl>200)w++;if(bl>r+30&&bl>90)cl++;if(r>bl+30&&r>120)wm++}
-  const f=eMM.f;return f==="white"?w/n:f==="cool"?cl/n:f==="warm"?wm/n:b/n}catch(e){return 0.5}}}}
-const eCv=document.createElement("canvas");eCv.width=64;eCv.height=32;const eCx=eCv.getContext("2d",{willReadFrequently:true});let eSmm={};
-function eStrips(v,f,N){eCx.drawImage(v,0,0,64,32);const p=eCx.getImageData(0,0,64,32).data,out=new Array(N).fill(0),cnt=new Array(N).fill(0);
- for(let y=0;y<32;y++)for(let x=0;x<64;x++){const i=(y*64+x)*4,r=p[i],g=p[i+1],b=p[i+2],k=Math.floor(x*N/64);cnt[k]++;
-  const mx=Math.max(r,g,b),mn=Math.min(r,g,b);
-  out[k]+=f==="white"?(r>200&&g>200&&b>200):f==="cool"?(b>r+30&&b>90):f==="warm"?(r>b+30&&r>120):f==="bright"?(r+g+b)/765:f==="sat"?(mx?(mx-mn)/mx:0):0}
- return out.map((s,k)=>s/cnt[k])}
+function mkLive(){const c=document.createElement("canvas");c.width=CW;c.height=CH;const g=c.getContext("2d",{willReadFrequently:true});
+ return{read(v){try{g.drawImage(v,0,0,CW,CH);const p=g.getImageData(0,0,CW,CH).data;let n=0,t=0;for(let y=0;y<CH;y++)for(let x=0;x<CW;x++){if(masked(x,y))continue;const i=(y*CW+x)*4;n++;t+=pxF(eMM.f==="edge"?"bright":eMM.f,p[i],p[i+1],p[i+2])}return n?t/n:0}catch(e){return 0.5}}}}
+const eCv=document.createElement("canvas");eCv.width=CW;eCv.height=CH;const eCx=eCv.getContext("2d",{willReadFrequently:true});let eSmm={};
+function eStrips(v,f,N){eCx.drawImage(v,0,0,CW,CH);const p=eCx.getImageData(0,0,CW,CH).data,out=new Array(N).fill(0),cnt=new Array(N).fill(0);
+ for(let y=0;y<CH;y++)for(let x=0;x<CW;x++){if(masked(x,y))continue;const i=(y*CW+x)*4,k=Math.floor(x*N/CW);cnt[k]++;out[k]+=pxF(f,p[i],p[i+1],p[i+2])}
+ return out.map((s,k)=>cnt[k]?s/cnt[k]:0)}
 function eSweep(){const v=$("ev");let st;try{st=eStrips(v,eMM.f==="edge"?"bright":eMM.f,8)}catch(e){return null}
  for(const x of st){eSmm.lo=Math.min(eSmm.lo??x,x);eSmm.hi=Math.max(eSmm.hi??x,x)}const [lo,hi]=eRange(eSmm.lo,eSmm.hi),now=Tone.now()+0.1;
  st.forEach((x,k)=>{const a=hi>lo?Math.max(0,Math.min(1,(x-lo)/(hi-lo))):0;if(a<0.08)return;
@@ -260,7 +264,7 @@ function eChunk(){const v=$("ev");if(v.paused)return;
 async function ePlay(){stopAll();await ensure();eStop();ePos=0;eSmm={};const v=$("ev");v.currentTime=0;await v.play().catch(()=>{});eChunk();eTimer=setInterval(eChunk,2000)}
 function eStop(){clearInterval(eTimer);eTimer=null;try{$("ev").pause();sampler&&sampler.releaseAll()}catch(e){}}
 $("eplay").onclick=ePlay;$("estop").onclick=eStop;
-$("efile").onchange=e=>{const f=e.target.files[0];if(!f)return;eStop();eLive=mkLive();eMM={f:$("efeat").value==="auto"?"white":$("efeat").value};$("ev").src=URL.createObjectURL(f);$("ev").muted=true;
+$("efile").onchange=e=>{const f=e.target.files[0];if(!f)return;eStop();eMask=[];eLive=mkLive();eMM={f:$("efeat").value==="auto"?"white":$("efeat").value};$("ev").src=URL.createObjectURL(f);$("ev").muted=true;
  $("esrc").textContent="Your own video: features estimated live from pixels (lower accuracy than the catalogue items above).";$("einfo").textContent="Press play."};
 eicLoad();
 </script>
