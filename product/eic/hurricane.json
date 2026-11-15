@@ -1,0 +1,66 @@
+{
+ "key": "hurricane",
+ "zh": "大西洋飓风风速（全年）",
+ "svs": "5072",
+ "en": "Atlantic Hurricane Wind Speed Plots",
+ "file": "atlantic_jan_to_dec_singleYear.mp4",
+ "duration": 6.416667,
+ "step": 1.0,
+ "steps": [
+  {
+   "t": 0.0,
+   "bright": 0.1487,
+   "sat": 0.2493,
+   "warm": 0.0,
+   "cool": 0.007,
+   "white": 0.0,
+   "edge": 0.0638
+  },
+  {
+   "t": 1.0,
+   "bright": 0.1436,
+   "sat": 0.2502,
+   "warm": 0.0,
+   "cool": 0.002,
+   "white": 0.0,
+   "edge": 0.0584
+  },
+  {
+   "t": 2.0,
+   "bright": 0.1455,
+   "sat": 0.2498,
+   "warm": 0.0,
+   "cool": 0.0032,
+   "white": 0.0,
+   "edge": 0.0604
+  },
+  {
+   "t": 3.0,
+   "bright": 0.1442,
+   "sat": 0.2523,
+   "warm": 0.0,
+   "cool": 0.0024,
+   "white": 0.0,
+   "edge": 0.0595
+  },
+  {
+   "t": 4.0,
+   "bright": 0.1499,
+   "sat": 0.2514,
+   "warm": 0.0,
+   "cool": 0.0063,
+   "white": 0.0,
+   "edge": 0.0662
+  },
+  {
+   "t": 5.0,
+   "bright": 0.1518,
+   "sat": 0.2547,
+   "warm": 0.0,
+   "cool": 0.0089,
+   "white": 0.0,
+   "edge": 0.0672
+  }
+ ],
+ "source": "https://svs.gsfc.nasa.gov/5072/"
+}

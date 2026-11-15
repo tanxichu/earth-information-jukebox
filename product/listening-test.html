@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Listening test — Listen to Earth</title><link rel="icon" href="../icon192.png">
+<style>
+:root{--bg:#f4f5f8;--fg:#1c2030;--card:#fff;--ac:#1565c0;--mut:#555c70;--bd:#c9cedd}
+@media(prefers-color-scheme:dark){:root{--bg:#12141c;--fg:#e8eaf2;--card:#1d2030;--ac:#7db3ff;--mut:#a3aac0;--bd:#3a4058}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:20px/1.65 system-ui,sans-serif}main{max-width:720px;margin:0 auto;padding:16px 16px 60px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin:14px 0}h1{font-size:28px}h2{font-size:21px;margin:0 0 8px}.mut{color:var(--mut);font-size:17px}
+button,select,input{font:inherit;padding:12px 16px;border-radius:10px;border:2px solid var(--bd);background:var(--card);color:var(--fg);min-height:48px}
+button.go{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:700}@media(prefers-color-scheme:dark){button.go{color:#101218}}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-offset:2px}.row{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}pre{white-space:pre-wrap;word-break:break-all;font-size:14px}
+select{max-width:100%}label{max-width:100%;display:inline-block}</style></head><body><main>
+<h1>Listening test</h1>
+<div class="card"><h2>What this is</h2><p>A short test of one thing: <b>can you hear "more ice" and "less ice" in the piano, without pictures and without narration?</b> About 5 minutes, headphones, silent switch off. There are no wrong feelings: if you cannot tell, say "about the same". Please do not enter a real name; use a code like L1.</p></div>
+<div class="card" id="s0"><h2>Before you start</h2>
+<div class="row"><label>Listener code <input id="id" size="6" placeholder="L1"></label>
+<label>How do you usually see? <select id="vis"><option>sighted (eyes open)</option><option>sighted, eyes closed during the test</option><option>low vision</option><option>blind</option></select></label></div>
+<div class="row"><label>Do you use a screen reader? <select id="sr"><option>no</option><option>yes</option></select></label></div>
+<p class="mut">Learn the sound first (no scoring):</p>
+<div class="row"><button id="l1">▶ Lots of ice</button><button id="l2">▶ Little ice</button></div>
+<p class="mut">The piano plays more notes when there is more ice, and fewer when there is less.</p>
+<button class="go" id="start">Start the test</button></div>
+<div class="card" id="s1" hidden><h2 id="tn"></h2><p>Two short phrases of the same music. <b>Which one has more ice?</b></p>
+<div class="row"><button id="pX">▶ Play X</button><button id="pY">▶ Play Y</button></div>
+<div class="row"><button class="go" data-a="X">X has more ice</button><button class="go" data-a="Y">Y has more ice</button><button class="go" data-a="S">About the same</button></div>
+<p class="mut" id="prog"></p></div>
+<div class="card" id="s2" hidden><h2>Result</h2><p id="res"></p><p class="mut">Please send the text below back to the person who gave you this test (it contains no name).</p><pre id="out"></pre><div class="row"><button id="copy">Copy results</button></div></div>
+<script>
+const $=id=>document.getElementById(id);
+const EXT={1990:6.14,2000:6.25,2007:4.27,2020:4.00,2026:4.81};const TEST=Object.keys(EXT).map(Number);
+const aud=src=>{const a=new Audio("../playlist/"+src);return a};let cur=null;
+function play(y){if(cur){cur.pause()}cur=aud("phrase_"+y+".mp3");cur.play()}
+$("l1").onclick=()=>play(1980);$("l2").onclick=()=>play(2012);
+let trials=[],i=0,t0=0,log=[];
+function shuffle(a){for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a}
+$("start").onclick=()=>{trials=[];for(let a=0;a<TEST.length;a++)for(let b=a+1;b<TEST.length;b++){let p=[TEST[a],TEST[b]];if(Math.random()<.5)p.reverse();trials.push(p)}shuffle(trials);i=0;log=[];$("s0").hidden=true;$("s1").hidden=false;next()};
+function next(){if(i>=trials.length)return done();const[x,y]=trials[i];$("tn").textContent="Pair "+(i+1)+" of "+trials.length;$("prog").textContent="Play each as often as you like, then answer.";t0=Date.now();$("pX").onclick=()=>play(x);$("pY").onclick=()=>play(y)}
+document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{const[x,y]=trials[i],d=EXT[x]-EXT[y],truth=Math.abs(d)<0.3?"S":(d>0?"X":"Y"),ans=b.dataset.a;log.push({pair:[x,y],diff:+d.toFixed(2),truth,answer:ans,correct:ans===truth,sec:Math.round((Date.now()-t0)/1000)});if(cur)cur.pause();i++;next()});
+function done(){$("s1").hidden=true;$("s2").hidden=false;const ok=log.filter(l=>l.correct).length,clear=log.filter(l=>l.truth!=="S"),okc=clear.filter(l=>l.correct).length;
+ $("res").textContent=ok+" of "+log.length+" pairs right ("+okc+" of "+clear.length+" pairs where the ice clearly differed).";
+ $("out").textContent=JSON.stringify({listener:$("id").value||"?",vision:$("vis").value,screen_reader:$("sr").value,narration:"off",picture:"hidden",correct_all:ok+"/"+log.length,correct_clear:okc+"/"+clear.length,trials:log},null,1)}
+$("copy").onclick=()=>navigator.clipboard&&navigator.clipboard.writeText($("out").textContent);
+</script></main></body></html>

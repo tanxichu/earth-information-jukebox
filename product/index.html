@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Listen to Earth — Arctic sea ice</title><link rel="icon" href="../icon192.png">
+<meta name="description" content="Hear 48 Septembers of Arctic sea ice: a Debussy piano piece thins out as NASA/NSIDC data shrinks. Accessible, audio-first.">
+<link rel="manifest" href="../manifest.webmanifest"><link rel="apple-touch-icon" href="../icon192.png"><meta name="theme-color" content="#1565c0">
+<style>
+:root{--bg:#f4f5f8;--fg:#1c2030;--card:#fff;--ac:#1565c0;--mut:#555c70;--bd:#c9cedd}
+@media(prefers-color-scheme:dark){:root{--bg:#12141c;--fg:#e8eaf2;--card:#1d2030;--ac:#7db3ff;--mut:#a3aac0;--bd:#3a4058}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.65 system-ui,-apple-system,sans-serif}
+main{max-width:780px;margin:0 auto;padding:16px 16px 60px}.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;background:var(--card);padding:8px;z-index:9}
+h1{font-size:32px;line-height:1.15;margin:18px 0 6px;background:linear-gradient(90deg,var(--ac),#7e57c2);-webkit-background-clip:text;background-clip:text;color:transparent}h2{font-size:21px;margin:0 0 8px}.sub{color:var(--mut);margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;margin:16px 0;box-shadow:0 2px 10px #0001}
+button,select,input[type=number]{font:inherit;padding:10px 14px;border-radius:10px;border:2px solid var(--bd);background:var(--card);color:var(--fg);min-height:44px}
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+button.go{background:linear-gradient(135deg,var(--ac),#5e35b1);color:#fff;border-color:var(--ac);font-size:22px;padding:16px 28px;width:100%;font-weight:700}
+@media(prefers-color-scheme:dark){button.go{color:#101218}}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}.row label{max-width:100%}select,input[type=file]{max-width:100%}@media(max-width:640px){.row label{display:block;width:100%}.row select,.row input[type=file]{width:100%;box-sizing:border-box}}.mut{color:var(--mut)}svg{width:100%;height:auto;display:block}
+input[type=range]{width:100%;height:36px}.big{font-size:36px;font-weight:800;line-height:1.1}
+#cap{min-height:3.4em;font-size:20px}.lang{float:right}label{display:inline-flex;align-items:center;gap:6px;margin-right:12px}
+.step{border-left:4px solid var(--ac);padding-left:12px;margin:8px 0}details summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+</style></head><body>
+<a class="skip" href="#story" data-i="skip">Skip to the listening experience</a>
+<main>
+<button class="lang" id="lang" aria-label="Switch language / 切换语言">中文</button>
+<h1 data-i="h1">Listen to 48 Septembers of Arctic sea ice</h1>
+<p class="sub" data-i="sub">One piano piece. One number per year. As the ice shrinks, the piano thins out. Best with headphones; turn off your phone's silent switch.</p>
+
+<section id="story" class="card" aria-labelledby="h_story">
+<h2 id="h_story" data-i="h_story">1. The guided listen (about 1 minute)</h2>
+<div id="vis"><figure id="mapfig" tabindex="0" role="application" aria-label="Sea ice map. Arrow keys move the cursor, S scans the row." style="margin:8px 0;text-align:center;outline-offset:4px"><div id="mapwrap" style="position:relative;display:inline-block;line-height:0"><img id="map" alt="" style="max-width:100%;max-height:340px;border-radius:10px;background:#fff;touch-action:none"><div id="mcur" style="position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border:3px solid #ff2d95;border-radius:50%;pointer-events:none;box-shadow:0 0 0 2px #fff"></div></div><figcaption class="mut" style="font-size:14px">NSIDC Sea Ice Index v4.0 (NOAA@NSIDC): September ice extent map</figcaption></figure>
+<p class="mut" id="maphelp" data-i="maphelp" style="font-size:14px">Touch the map, or focus it and use the arrow keys: a high piano note means ice, a low note means open water, silence means land. Press S to scan the current row left to right.</p><p id="minfo" class="mut" role="status" aria-live="polite"></p>
+<svg id="chart" viewBox="0 0 600 220" role="img" aria-label="Line chart of the chosen data over the years"></svg>
+<p class="big" id="big"></p><p id="desc" class="mut"></p></div>
+<button class="go" id="guided" data-i="guided">▶ Press to listen</button>
+<p id="cap" role="status" aria-live="polite" class="mut"></p>
+<div class="row"><button id="stop" data-i="stop">■ Stop</button><label><input type="checkbox" id="narr" checked> <span data-i="narr">Narration</span></label><label><input type="checkbox" id="vib" checked> <span data-i="vib">Vibration (Android)</span></label></div>
+</section>
+
+<section class="card" aria-labelledby="h_ds">
+<h2 id="h_ds" data-i="h_ds">Choose the data</h2>
+<div class="row"><label><span data-i="ds">Dataset</span>&nbsp;<select id="ds"></select></label></div>
+<p class="mut" id="dsnote"></p>
+<p class="mut" data-i="ds_p">The guided listen above always uses Arctic sea ice. Sections 2 and 3 use the dataset chosen here. Same rule for all: the more of the measured thing, the more of the piano plays.</p>
+</section>
+
+<section class="card" aria-labelledby="h_ab">
+<h2 id="h_ab" data-i="h_ab">2. Same phrase, two years</h2>
+<p class="mut" data-i="ab_p">Plays the same 8 seconds of music twice. Only the data changes, so every difference you hear comes from the ice.</p>
+<div class="row"><label><span data-i="ya">Year A</span>&nbsp;<select id="ya"></select></label><label><span data-i="yb">Year B</span>&nbsp;<select id="yb"></select></label></div>
+<div class="row"><button id="pa" class="go" style="width:auto;font-size:18px;padding:12px 22px">▶ A</button><button id="pb" class="go" style="width:auto;font-size:18px;padding:12px 22px">▶ B</button><button id="pab" data-i="pab">A then B</button></div>
+<p id="abinfo" class="mut" role="status" aria-live="polite"></p>
+</section>
+
+
+<section id="eicsec" class="card" aria-labelledby="h_eic">
+<h2 id="h_eic">NASA EIC animations → live piano</h2>
+<p class="mut"><b>Purpose:</b> test whether people can <i>hear</i> a real NASA Earth Information Center (SVS) animation change. Technique: the animation is read pixel by pixel in the browser. <b>Sweep</b> mode scans each frame west→east in 8 strips every 2 seconds: each strip becomes one note (more of the feature = higher, louder; none = silence), so you hear <i>where</i> things are. <b>Whole frame</b> mode uses the whole frame's share of the feature to decide how many notes of a public-domain Debussy piece play. The feature is picked automatically as the one that changes most in that animation, or you choose it.</p>
+<div class="row"><label>Animation <select id="evid"></select></label> <label>Mode <select id="emode"><option value="sweep">Sweep across the map (melody = where it is)</option><option value="whole">Whole frame (piano fullness = how much)</option></select></label> <label>Piano follows <select id="efeat"><option value="auto">best match (automatic)</option><option value="white">white / ice / cloud</option><option value="cool">blue / water</option><option value="warm">warm colour</option><option value="bright">brightness</option><option value="edge">detail</option></select></label></div>
+<video id="ev" muted loop playsinline controls style="width:100%;border-radius:8px;background:#000" aria-label="NASA animation"></video>
+<div class="row"><button id="eplay" style="font-size:18px;padding:12px 22px">▶ Play animation + piano</button> <button id="estop">■ Stop</button> <label>Or your own SVS video <input type="file" id="efile" accept="video/*"></label></div>
+<div class="bar" aria-hidden="true" style="height:8px;background:#8884;border-radius:4px;overflow:hidden"><i id="ebar" style="display:block;height:100%;width:0;background:#1565c0"></i></div>
+<p id="einfo" class="mut" role="status" aria-live="polite"></p>
+<p id="esrc" class="mut"></p>
+</section>
+
+<section class="card" aria-labelledby="h_two">
+<h2 id="h_two" data-i="h_two">2b. Same year, two measurements</h2>
+<p class="mut" data-i="two_p">Pick one year and two kinds of data. The same 8 seconds of music play for each, thinned by its own number. Note that for temperature and CO₂, a bigger number means more piano.</p>
+<div class="row"><label><span data-i="two_y">Year</span>&nbsp;<select id="ty"></select></label><label><span data-i="two_x">First</span>&nbsp;<select id="tx"></select></label><label><span data-i="two_z">Second</span>&nbsp;<select id="tz"></select></label></div>
+<div class="row"><button id="tp1" class="go" style="width:auto;font-size:18px;padding:12px 22px">▶ 1</button><button id="tp2" class="go" style="width:auto;font-size:18px;padding:12px 22px">▶ 2</button><button id="tp12" data-i="tpab">First then second</button></div>
+<p id="tinfo" class="mut" role="status" aria-live="polite"></p>
+</section>
+
+<section class="card" aria-labelledby="h_ex">
+<h2 id="h_ex" data-i="h_ex">3. Explore the years</h2>
+<label for="yr" data-i="yr">Year</label>
+<input type="range" id="yr" min="1979" max="2026" value="1979">
+
+<div class="row"><button id="say" data-i="say">Read this year's data</button><button id="why" data-i="why">Why does it sound like this?</button><button id="sweep" data-i="sweep">▶ Play 1979 → 2026</button></div>
+<p class="mut" data-i="keys">Keyboard: ← → change year, A / B play the two years, Space starts or stops the guided listen.</p>
+</section>
+
+<section class="card" aria-labelledby="h_set">
+<h2 id="h_set" data-i="h_set">Settings</h2>
+<div class="row"><label><span data-i="piece">Piece</span>&nbsp;<select id="mid"><option value="../midi/L117-prel-4.mid">Debussy — Prélude 4 (public domain)</option><option value="../midi/debussy_Ste_Bergamesq_Clair.mid">Debussy — Clair de lune (public domain)</option><option value="../midi/debussy_Arabesque_1.mid">Debussy — Arabesque 1 (public domain)</option></select></label></div>
+<div class="row"><label><input type="checkbox" id="eq" checked> <span data-i="eq">Equal loudness (hear thinner, not quieter)</span></label><label><input type="checkbox" id="thin" checked> <span data-i="thin">Data thins the piano</span></label><label><input type="checkbox" id="dv" checked> <span data-i="dv">Data tone (pitch = value)</span></label></div>
+<p class="mut" data-i="piece_note">The piece is provisional and can be swapped; the data rules stay the same.</p>
+</section>
+
+<section class="card" aria-labelledby="h_more">
+<h2 id="h_more" data-i="h_more">More NASA visualizations</h2>
+<p><a href="#eicsec" data-i="more_a">Try 17 other NASA EIC animations (auto-generated, not curated)</a></p>
+</section>
+
+<section class="card" aria-labelledby="h_how">
+<h2 id="h_how" data-i="h_how">How it works, and what it can and cannot say</h2>
+<details open><summary data-i="s1">The rule</summary><p data-i="r1">September Arctic sea ice extent (million km²) sets how much of the piano plays. The scale is fixed from 3 to 8 and never auto-scaled. From 5% of the scale the top melody line plays, from 30% the bass is added, above that the inner voices return one by one. A separate sine tone plays the same number as a pitch on a fixed D-dorian scale, D4 to D6: higher means more ice. With 'equal loudness' on (default) the music level is compensated so you hear fewer notes, not a quieter piano; turn it off to hear the raw level. Narration lowers the music volume only; it does not change which notes play, so narration is never mistaken for data.</p></details>
+<details><summary data-i="s2">What the data can say</summary><p data-i="r2">One value per year, always September, so this is a long-term comparison, not a seasonal cycle. It shows a decline since 1979 with large year-to-year variation (lowest in this record: 2012, 3.57 million km², 44% below the 1981–2010 mean of 6.41). It does not say why, and a single year can bounce back.</p></details>
+<details><summary data-i="s3">What is data and what is Debussy</summary><p data-i="r3">The notes, pitches and rhythm belong to Debussy. The data decides which of those notes are played, and a separate sine tone is generated from the data. We do not claim that every note comes from NASA data.</p></details>
+<details><summary data-i="s4">Sources, licences, AI use</summary><p data-i="r4">Data: NSIDC Sea Ice Index v4.0 (NOAA@NSIDC, G02135), monthly CSV, Northern Hemisphere, September. Baseline: mean of 1981–2010 values in the same file. Music: Debussy, public-domain scores, MIDI from the Mutopia Project. Piano: Salamander Grand Piano samples (CC-BY, Alexander Holm). Narration: synthetic voice (VoxCPM2, Apache-2.0), a generic voice, not a clone of any person; if the narration file is missing the page falls back to your browser's built-in voice. This page, its code and its text were made with AI assistance. No voice or likeness of a minor appears in this work. Code is open source.</p></details>
+</section>
+</main>
+<script src="../vendor/Tone.js"></script>
+<script src="../vendor/Midi.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const L={en:{},zh:{skip:"跳到收听体验",h1:"听 48 个九月的北极海冰",sub:"一首钢琴曲，每年一个数字。冰越少，钢琴越薄。请戴耳机，并关掉手机静音开关。",h_story:"1. 引导收听（约 1 分钟）",guided:"▶ 点击收听",stop:"■ 停止",narr:"解说",vib:"震动（安卓）",h_ab:"2. 同一句乐句，两个年份",ab_p:"把同样的 8 秒音乐播放两次。只有数据不同，所以你听到的每一处差别都来自海冰。",ya:"年份 A",yb:"年份 B",pab:"先 A 后 B",tpab:"先第一个后第二个",maphelp:"触摸地图，或点一下再用方向键移动：高音钢琴音 = 海冰，低音 = 海面，没有声音 = 陆地。按 S 把当前这一行从左到右扫一遍。",h_two:"2b. 同一年，两种数据",two_p:"选一年和两种数据。同样的 8 秒音乐各放一遍，各按自己的数值变薄。注意：气温和二氧化碳是数值越大钢琴越多。",two_y:"年份",two_x:"第一个",two_z:"第二个",h_ex:"3. 逐年探索",yr:"年份",say:"读出这一年的数据",why:"为什么听起来是这样？",sweep:"▶ 播放 1979 → 2026",keys:"键盘：← → 换年份，A / B 播放两个年份，空格开始或停止引导收听。",h_set:"设置",piece:"曲目",thin:"数据抽薄钢琴",h_ds:"选择数据",ds:"数据集",ds_p:"上面的引导收听固定用北极海冰。第 2、3 部分用这里选的数据集。规则都一样：被测的东西越多，钢琴演奏得越多。",eq:"等响度（听到变薄，而不是变小声）",dv:"数据音（音高 = 数值）",piece_note:"曲目是暂定的，可以更换，数据规则不变。",h_more:"更多 NASA 可视化",more_a:"试试另外 17 个 NASA EIC 动画（自动生成，未精修）",h_how:"原理，以及它能说什么、不能说什么",s1:"规则",s2:"数据能说明什么",s3:"哪些来自数据，哪些来自德布西",s4:"来源、许可、AI 使用",
+r1:"9 月北极海冰范围（百万平方公里）决定钢琴演奏多少。标尺固定为 3 到 8，不自动缩放。达到 5% 时出现最高旋律线，达到 30% 加入低音，再往上内声部逐个回来。另有一个正弦音，用同一个数值在固定的 D 多利亚音阶（D4–D6）上取音高：越高冰越多。解说只降低音乐音量，不改变演奏哪些音，所以不会被当成数据。",
+r2:"每年一个值，永远是 9 月，所以这是长期比较，不是季节循环。它显示 1979 年以来的下降，年际波动很大（这份记录中最低是 2012 年，357 万平方公里，比 1981–2010 平均值 641 万低 44%）。它不说明原因，单个年份也可能反弹。",
+r3:"音符、音高、节奏属于德布西。数据决定其中哪些音被演奏，另有一个由数据生成的正弦音。我们不声称每个音都来自 NASA 数据。",
+r4:"数据：NSIDC Sea Ice Index v4.0（NOAA@NSIDC，G02135），北半球 9 月月度 CSV。基准：同一文件 1981–2010 年值的平均。音乐：德布西，公共领域乐谱，MIDI 来自 Mutopia。钢琴：Salamander Grand Piano 采样（CC-BY）。解说：合成声音（VoxCPM2，Apache-2.0），通用声音，不克隆任何人；解说文件缺失时用浏览器自带声音。本页、代码和文字由 AI 协助完成。作品中没有未成年人的声音或形象。代码开源。"}};
+document.querySelectorAll("[data-i]").forEach(e=>L.en[e.dataset.i]=e.innerHTML);
+let lang="en";function setLang(l){lang=l;document.documentElement.lang=l==="zh"?"zh-CN":"en";document.querySelectorAll("[data-i]").forEach(e=>{const t=L[l][e.dataset.i];if(t!=null)e.innerHTML=t});$("lang").textContent=l==="zh"?"English":"中文";show(+$("yr").value)}
+$("lang").onclick=()=>setLang(lang==="en"?"zh":"en");
+
+let LO=3,HI=8;const SCALE=[62,64,65,67,69,71,72,74,76,77,79,81,83,84,86];
+const amt=e=>Math.max(0,Math.min(1,(e-LO)/(HI-LO))),dataPitch=a=>SCALE[Math.min(SCALE.length-1,Math.floor(a*SCALE.length))];
+let DSS=[],DS=null,YR=[],EX=[],BASE=0,notes=[],sampler=null,dsyn=null,mus=null,comp=null,loadedMid="",part=null,A=1,tick=null,RUN=0,lastA=1;
+function hash(i){let x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)}
+function buildNotes(midi){const out=[];midi.tracks.forEach((tr,ti)=>tr.notes.forEach(n=>out.push({t:n.time,d:n.duration,m:n.midi,v:n.velocity,tr:ti})));
+ out.sort((a,b)=>a.t-b.t);const g={};out.forEach((n,i)=>{n.i=i;const k=Math.round(n.t/0.04)+"_"+n.tr;(g[k]=g[k]||[]).push(n)});
+ const used=[...new Set(out.map(n=>n.tr))].sort(),up=used[0],lo=used[used.length-1];
+ Object.values(g).forEach(a=>{const hi=a.reduce((p,q)=>q.m>p.m?q:p),l=a.reduce((p,q)=>q.m<p.m?q:p);a.forEach(n=>{n.rank=(n.tr===up&&n===hi)?0:(n.tr===lo&&n===l)?1:2+hash(n.i)})});return out}
+const keepWith=(n,a)=>{if(!$("thin").checked)return true;if(n.rank===0)return a>=0.05;if(n.rank===1)return a>=0.30;return (n.rank-2)<(a-0.30)/0.70};
+function ratio(a){let all=0,kept=0;for(const n of notes){const e=n.v*n.v;all+=e;if(keepWith(n,a))kept+=e}return all?Math.max(kept/all,0.02):1}
+function eqGain(a){return $("eq").checked?Math.min(3.5,1/Math.sqrt(ratio(a))):1}
+async function ensure(){await Tone.start();
+ if(loadedMid!==$("mid").value){notes=buildNotes(await Midi.fromUrl($("mid").value));loadedMid=$("mid").value}
+ if(sampler)return;const lim=new Tone.Limiter(-3).toDestination(),rev=new Tone.Reverb({decay:3,wet:0.25}).connect(lim);await rev.generate();
+ mus=new Tone.Gain(1).connect(rev);comp=new Tone.Gain(1).connect(mus);
+ sampler=new Tone.Sampler({urls:{A1:"A1.mp3",A2:"A2.mp3",A3:"A3.mp3",A4:"A4.mp3",A5:"A5.mp3",A6:"A6.mp3",C2:"C2.mp3",C3:"C3.mp3",C4:"C4.mp3",C5:"C5.mp3",C6:"C6.mp3","D#3":"Ds3.mp3","D#4":"Ds4.mp3","D#5":"Ds5.mp3","F#3":"Fs3.mp3","F#4":"Fs4.mp3","F#5":"Fs5.mp3"},baseUrl:"../vendor/salamander/",release:1}).connect(comp);
+ await Tone.loaded();dsyn=new Tone.Synth({oscillator:{type:"sine"},envelope:{attack:0.05,decay:0.2,sustain:0.3,release:1.2},volume:-14}).connect(rev)}
+function stopAll(){RUN++;typeof eStop==="function"&&eStop();clearInterval(tick);speechSynthesis.cancel();if(window._na){window._na.pause();window._na=null}try{Tone.Transport.stop();Tone.Transport.cancel();part&&part.dispose();sampler&&sampler.releaseAll();mus&&mus.gain.rampTo(1,0.1)}catch(e){}}
+const ex=y=>EX[YR.indexOf(+y)],pct=e=>Math.round(100*(e-BASE)/BASE);
+function cmpTxt(e){if(DS.cmp==='anom')return (e>=0?'+':'')+e.toFixed(DS.dec)+' '+DS.unit+' relative to the '+DS.base[0]+'–'+DS.base[1]+' average';if(DS.cmp==='pct')return (pct(e)>0?'+':'')+pct(e)+'% vs '+DS.base[0]+'–'+DS.base[1]+' mean';const d=e-BASE;return (d>=0?'+':'')+d.toFixed(DS.dec)+' '+DS.unit+' vs '+(DS.base[0]===DS.base[1]?DS.base[0]:DS.base[0]+'–'+DS.base[1])}
+const vibrate=p=>{if($("vib").checked&&navigator.vibrate)navigator.vibrate(p)};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function vib(a){if((lastA>=0.30&&a<0.30)||(lastA>=0.05&&a<0.05))vibrate([120,60,120]);lastA=a}
+async function phrase(y,id,d){const e=d?d.values[d.years.indexOf(+y)]:ex(y),a=d?Math.max(0,Math.min(1,(e-d.lo)/(d.hi-d.lo))):amt(e),t0=Math.min(...notes.map(n=>n.t))+20,t1=t0+8,now=Tone.now()+0.2;vib(a);comp.gain.value=eqGain(a);
+ notes.filter(n=>n.t>=t0&&n.t<t1&&keepWith(n,a)).forEach(n=>sampler.triggerAttackRelease(Tone.Frequency(n.m,"midi"),n.d,now+n.t-t0,n.v*0.9));
+ if($("dv").checked)for(let k=0;k<4;k++)dsyn.triggerAttackRelease(Tone.Frequency(dataPitch(a),"midi"),1.6,now+k*2);
+ return e}
+function abtxt(w,y,e){return (w?w+": ":"")+y+" — "+e.toFixed(DS.dec)+" "+DS.unit+" ("+cmpTxt(e)+")"}
+// narration: file if present, else browser voice, else read-time wait; music is ducked (volume only, never notes)
+const NT={n_intro:"Arctic sea ice, every September, from nineteen seventy-nine to twenty twenty-six. More ice, more piano.",n_1980:"Nineteen eighty. Seven point six seven million square kilometres.",n_2012:"Twenty twelve. Three point five seven million square kilometres. The lowest on record.",n_2026:"In twenty twenty-six, September ice was four point eight one million square kilometres."};
+async function say(id){const run=RUN;$("cap").textContent=NT[id];if(!$("narr").checked){await wait(3000);return}
+ mus&&mus.gain.rampTo(0.3,0.3);
+ let played=false;try{const r=await fetch("../narr/"+id+".wav",{method:"HEAD"});if(r.ok){await new Promise((res,rej)=>{const a=new Audio("../narr/"+id+".wav");window._na=a;a.onended=res;a.onerror=rej;a.play().catch(rej)});played=true}}catch(e){}
+ if(!played&&"speechSynthesis" in window){await new Promise(res=>{const u=new SpeechSynthesisUtterance(NT[id]);u.lang="en-US";u.rate=0.95;u.onend=res;u.onerror=res;speechSynthesis.speak(u)})}
+ else if(!played)await wait(NT[id].length*70);
+ mus&&mus.gain.rampTo(1,0.5);if(run!==RUN)throw "stopped"}
+let G=false;
+async function guided(){stopAll();G=true;const run=RUN;if(DS.id!=="arctic"){$("ds").value="arctic";setDS("arctic")}$("cap").textContent="Loading the piano… (first time about 10 s)";await ensure();if(run!==RUN)return;
+ try{phrase(1979);show(1979);await say("n_intro");await wait(2500);
+  $("yr").value=1980;show(1980);phrase(1980);await Promise.all([say("n_1980"),wait(8800)]);$("cap").textContent=abtxt("",1980,ex(1980));if(run!==RUN)return;
+  $("yr").value=2012;show(2012);phrase(2012);await Promise.all([say("n_2012"),wait(8800)]);$("cap").textContent=abtxt("",2012,ex(2012));if(run!==RUN)return;
+  $("cap").textContent=lang==="zh"?"从 1979 年到 2026 年：":"Now all the years, 1979 to 2026:";await sweepRun(run);
+  $("yr").value=2026;show(2026);phrase(2026);await Promise.all([say("n_2026"),wait(8800)]);$("cap").textContent=lang==="zh"?"完。":"End."}catch(e){}G=false}
+async function sweepRun(run){await ensure();const end=Math.max(...notes.map(n=>n.t+n.d));Tone.Transport.cancel();Tone.Transport.stop();Tone.Transport.position=0;
+ part=new Tone.Part((time,n)=>{if(keepWith(n,A))sampler.triggerAttackRelease(Tone.Frequency(n.m,"midi"),n.d,time,n.v*0.9)},notes.map(n=>[n.t,n])).start(0);
+ for(let t=0;t<end;t+=2)Tone.Transport.schedule(time=>{if($("dv").checked)dsyn.triggerAttackRelease(Tone.Frequency(dataPitch(A),"midi"),1.6,time)},t);
+ Tone.Transport.loop=true;Tone.Transport.loopEnd=end;Tone.Transport.start();
+ const dt=Math.max(120,Math.min(600,28000/YR.length));for(const y of YR){if(run!==RUN)return;$("yr").value=y;show(y);vib(A);comp.gain.rampTo(eqGain(A),0.3);await wait(dt)}
+ try{Tone.Transport.stop();part.dispose()}catch(e){}}
+function show(y){const e=ex(y);if(e==null)return;A=amt(e);$("big").textContent=y+" · "+e.toFixed(DS.dec)+" "+DS.unit;
+ const lv=A<0.3?(lang==="zh"?"只剩旋律线":"reduced to the melody line"):A<0.7?(lang==="zh"?"部分变薄":"partly thinned"):(lang==="zh"?"完整":"full");
+ $("desc").textContent=(lang==="zh"?y+"：":y+": ")+DS.name+" "+e.toFixed(DS.dec)+" "+DS.unit+" ("+cmpTxt(e)+"). "+(lang==="zh"?"钢琴：":"Piano: ")+lv+".";draw(y);
+ const im=$("map");$("mapfig").style.display=DS.img?"":"none";$("maphelp").style.display=$("minfo").style.display=DS.img?"":"none";if(DS.img){im.src="../img/sepx/N_"+y+"09_extn_v4.0.png";im.alt="Arctic sea ice extent map, September "+y+", extent "+e.toFixed(2)+" million square kilometres"}}
+function draw(c){const W=600,H=220,p=28,x=y=>p+(y-YR[0])/(YR[YR.length-1]-YR[0])*(W-2*p),yv=e=>H-p-(e-LO)/(HI-LO)*(H-2*p);
+ $("chart").innerHTML="<path d='"+YR.map((y,i)=>(i?"L":"M")+x(y)+","+yv(EX[i])).join(" ")+"' fill='none' stroke='currentColor' stroke-width='2' opacity='.6'/><line x1='"+x(c)+"' x2='"+x(c)+"' y1='"+p+"' y2='"+(H-p)+"' stroke='#1565c0' stroke-width='2'/><circle cx='"+x(c)+"' cy='"+yv(ex(c))+"' r='6' fill='#1565c0'/><text x='"+p+"' y='14' font-size='12' fill='currentColor'>"+HI+" "+DS.unit+"</text><text x='"+p+"' y='"+(H-8)+"' font-size='12' fill='currentColor'>"+LO+" · "+YR[0]+" → "+YR[YR.length-1]+"</text>"}
+function setDS(id){DS=DSS.find(d=>d.id===id)||DSS[0];YR=DS.years;EX=DS.values;LO=DS.lo;HI=DS.hi;const b=YR.map((y,i)=>[y,EX[i]]).filter(([y])=>y>=DS.base[0]&&y<=DS.base[1]).map(([,e])=>e);BASE=b.reduce((p,q)=>p+q,0)/b.length;
+ for(const k of["ya","yb"])$(k).innerHTML="";for(const k of["ya","yb"])YR.forEach(y=>{const o=document.createElement("option");o.value=y;o.textContent=y;$(k).appendChild(o)});
+ const lo=YR.indexOf(EX.indexOf(Math.min(...EX))>=0?YR[EX.indexOf(Math.min(...EX))]:YR[0]),hi=EX.indexOf(Math.max(...EX));$("ya").value=YR[Math.min(EX.indexOf(Math.min(...EX)),EX.indexOf(Math.max(...EX)))];$("yb").value=YR[Math.max(EX.indexOf(Math.min(...EX)),EX.indexOf(Math.max(...EX)))];
+ $("yr").min=YR[0];$("yr").max=YR[YR.length-1];$("yr").value=YR[0];$("sweep").textContent=(lang==="zh"?"▶ 播放 ":"▶ Play ")+YR[0]+" → "+YR[YR.length-1];
+ $("dsnote").innerHTML=DS.say+" <small>Source: "+DS.source+"."+(DS.featured?"":" (auto-generated, not curated)")+"</small>";show(YR[0])}
+async function load(){DSS=await (await fetch("../data/datasets.json")).json();DSS.forEach(d=>{const o=document.createElement("option");o.value=d.id;o.textContent=d.name+(d.featured?" ★":"");$("ds").appendChild(o)});$("ds").onchange=()=>{stopAll();setDS($("ds").value)};setDS("arctic");twoSetup()}
+async function play1(w){stopAll();$("abinfo").textContent="…";await ensure();const y=+$(w==="A"?"ya":"yb").value,e=await phrase(y);$("abinfo").textContent=abtxt(w,y,e)}
+$("guided").onclick=guided;$("stop").onclick=()=>{stopAll();G=false;$("cap").textContent=""};
+
+function twoSetup(){const ys=DSS.map(d=>d.years),y0=Math.max(...ys.map(v=>v[0])),y1=Math.min(...ys.map(v=>v[v.length-1]));
+ for(let y=y0;y<=y1;y++){const o=document.createElement("option");o.value=y;o.textContent=y;$("ty").appendChild(o)}$("ty").value=y1;
+ for(const k of["tx","tz"])DSS.forEach(d=>{const o=document.createElement("option");o.value=d.id;o.textContent=d.short||d.name;$(k).appendChild(o)});$("tx").value="arctic";$("tz").value="temp"}
+async function playTwo(w){stopAll();$("tinfo").textContent="…";await ensure();const d=DSS.find(x=>x.id===$(w==="1"?"tx":"tz").value),y=+$("ty").value,e=await phrase(y,null,d),a=Math.max(0,Math.min(1,(e-d.lo)/(d.hi-d.lo)));
+ $("tinfo").textContent=y+" — "+d.name+": "+e.toFixed(d.dec)+" "+d.unit+" ("+(lang==="zh"?"钢琴：":"piano: ")+(a<0.3?(lang==="zh"?"只剩旋律线":"reduced to the melody line"):a<0.7?(lang==="zh"?"部分变薄":"partly thinned"):(lang==="zh"?"完整":"full"))+")"}
+$("tp1").onclick=()=>playTwo("1");$("tp2").onclick=()=>playTwo("2");$("tp12").onclick=async()=>{await playTwo("1");const r=RUN;await wait(8800);if(r===RUN)await playTwo("2")};
+
+const mapC=document.createElement("canvas"),mapX=mapC.getContext("2d",{willReadFrequently:true});let mcur={x:0.5,y:0.5},mscan=0;
+function mapDraw(){const im=$("map");if(!im.naturalWidth)return;mapC.width=im.naturalWidth;mapC.height=im.naturalHeight;try{mapX.drawImage(im,0,0)}catch(e){}placeCur()}
+$("map").addEventListener("load",mapDraw);if($("map").complete)mapDraw();
+function mapClass(fx,fy){if(!mapC.width||!$("map").naturalWidth)return"other";let p;try{p=mapX.getImageData(Math.min(mapC.width-1,Math.floor(fx*mapC.width)),Math.min(mapC.height-1,Math.floor(fy*mapC.height)),1,1).data}catch(e){return"other"}const r=p[0],g=p[1],b=p[2];
+ if(r>235&&g>235&&b>235)return"ice";if(b>90&&b>r+50)return"water";if(Math.abs(r-g)<12&&Math.abs(g-b)<12&&r>100&&r<140)return"land";return"other"}
+const MAPNOTE={ice:74,water:50};
+function placeCur(){const im=$("map"),w=im.clientWidth,h=im.clientHeight;$("mcur").style.left=(mcur.x*w)+"px";$("mcur").style.top=(mcur.y*h)+"px"}
+async function mapPlay(announce){const c=mapClass(mcur.x,mcur.y);
+ if(announce)$("minfo").textContent={ice:lang==="zh"?"海冰":"ice",water:lang==="zh"?"海面":"open water",land:lang==="zh"?"陆地":"land",other:lang==="zh"?"无数据（极点空洞、海岸线或图外）":"no data (pole hole, coastline or outside the map)"}[c];
+ if(MAPNOTE[c]){await ensure();dsyn.triggerAttackRelease(Tone.Frequency(MAPNOTE[c],"midi"),0.25)}return c}
+function mapAt(ev){const r=$("map").getBoundingClientRect();mcur={x:Math.max(0,Math.min(1,(ev.clientX-r.left)/r.width)),y:Math.max(0,Math.min(1,(ev.clientY-r.top)/r.height))};placeCur();mapPlay(true)}
+$("map").addEventListener("pointerdown",ev=>{mapAt(ev);$("mapfig").focus()});$("map").addEventListener("pointermove",ev=>{if(ev.buttons)mapAt(ev)});
+async function mapScanRow(){stopAll();const run=RUN,row=mcur.y;await ensure();let ice=0,tot=0;
+ for(let x=0.05;x<=0.95;x+=0.025){if(run!==RUN)return;mcur.x=x;placeCur();const c=await mapPlay(false);if(c==="ice")ice++;if(c==="ice"||c==="water")tot++;await wait(70)}
+ mcur.y=row;$("minfo").textContent=lang==="zh"?"这一行："+ice+" / "+tot+" 个采样点是海冰":"This row: "+ice+" of "+tot+" samples are ice"}
+$("mapfig").addEventListener("keydown",ev=>{const st=0.03;let m=true;if(ev.key==="ArrowLeft")mcur.x=Math.max(0,mcur.x-st);else if(ev.key==="ArrowRight")mcur.x=Math.min(1,mcur.x+st);else if(ev.key==="ArrowUp")mcur.y=Math.max(0,mcur.y-st);else if(ev.key==="ArrowDown")mcur.y=Math.min(1,mcur.y+st);else if(ev.key==="s"||ev.key==="S"){mapScanRow();ev.preventDefault();ev.stopPropagation();return}else m=false;
+ if(m){ev.preventDefault();ev.stopPropagation();placeCur();mapPlay(true)}});
+window.addEventListener("resize",placeCur);
+$("pa").onclick=()=>play1("A");$("pb").onclick=()=>play1("B");$("pab").onclick=async()=>{await play1("A");const r=RUN;await wait(8800);if(r===RUN)await play1("B")};
+$("yr").oninput=e=>show(+e.target.value);
+$("say").onclick=()=>{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance($("desc").textContent))};
+$("why").onclick=()=>{const t=L[lang].r1||L.en.r1;$("desc").textContent=t.replace(/<[^>]+>/g,"");speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance($("desc").textContent))};
+$("sweep").onclick=async()=>{stopAll();const run=RUN;await ensure();await sweepRun(run)};
+document.addEventListener("keydown",ev=>{if(["INPUT","SELECT","TEXTAREA"].includes(document.activeElement.tagName)&&ev.key!==" ")return;
+ if(ev.key==="ArrowRight"){$("yr").value=Math.min(YR[YR.length-1],+$("yr").value+1);show(+$("yr").value);ev.preventDefault()}
+ else if(ev.key==="ArrowLeft"){$("yr").value=Math.max(YR[0],+$("yr").value-1);show(+$("yr").value);ev.preventDefault()}
+ else if(ev.key==="a"||ev.key==="A"){play1("A")}else if(ev.key==="b"||ev.key==="B"){play1("B")}
+ else if(ev.key===" "&&document.activeElement.tagName!=="BUTTON"){ev.preventDefault();G?($("stop").click()):guided()}});
+load();
+
+// ---- NASA EIC animation -> piano (features precomputed per second from the SVS video; own files computed live on canvas)
+let EV={},EK=[],eTimer=null,ePos=0,eLive=null,eMM={},eSay=0;
+const EFEAT=["white","cool","warm","bright","sat","edge"],ENAME={white:"white / ice / cloud",cool:"blue / water",warm:"warm colour",bright:"brightness",sat:"colour strength",edge:"detail"};
+// automatic choice = the feature whose share of the frame changes the most over the animation (absolute change, so tiny specks don't win)
+function eBest(d){let best="white",bv=-1;for(const f of EFEAT){const a=d.steps.map(x=>x[f]),v=Math.max(...a)-Math.min(...a);if(v>bv){bv=v;best=f}}return best}
+// honest scale: the busiest frame = full piano; a change smaller than 30% of the peak never swings the piano from empty to full
+function eRange(lo,hi){const span=Math.max(hi-lo,0.3*hi,1e-6);return [hi-span,hi]}
+async function eicLoad(){try{EK=await (await fetch("eic/index.json")).json();for(const k of EK){EV[k]=await (await fetch("eic/"+k+".json")).json();const o=document.createElement("option");o.value=k;o.textContent=EV[k].en+" (SVS "+EV[k].svs+")";$("evid").appendChild(o)}
+ $("evid").onchange=ePick;$("efeat").onchange=ePick;$("emode").onchange=()=>{eSmm={}};ePick()}catch(e){$("einfo").textContent="Animations could not be loaded."}}
+function ePick(){eStop();eLive=null;const d=EV[$("evid").value];if(!d)return;$("ev").src="eic/"+d.key+".mp4";$("ev").muted=true;eMM={};
+ const f=$("efeat").value==="auto"?eBest(d):$("efeat").value;eMM.f=f;const a=d.steps.map(x=>x[f]);eMM.rlo=Math.min(...a);eMM.rhi=Math.max(...a);[eMM.lo,eMM.hi]=eRange(eMM.rlo,eMM.rhi);
+ $("esrc").innerHTML='Source: <a href="'+d.source+'" target="_blank" rel="noopener">NASA Scientific Visualization Studio, SVS '+d.svs+' — '+d.en+'</a> (public domain, used in the Earth Information Center).'}
+function eAmt(){const v=$("ev"),d=EV[$("evid").value];let x;
+ if(eLive){x=eLive.read(v);eMM.rlo=Math.min(eMM.rlo??x,x);eMM.rhi=Math.max(eMM.rhi??x,x);[eMM.lo,eMM.hi]=eRange(eMM.rlo,eMM.rhi)}
+ else{const i=Math.min(d.steps.length-1,Math.floor(v.currentTime/d.step));x=d.steps[i][eMM.f]}
+ eMM.x=x;return eMM.hi>eMM.lo+1e-6?Math.max(0,Math.min(1,(x-eMM.lo)/(eMM.hi-eMM.lo))):0.5}
+function mkLive(){const c=document.createElement("canvas");c.width=64;c.height=32;const g=c.getContext("2d",{willReadFrequently:true});
+ return{read(v){try{g.drawImage(v,0,0,64,32);const p=g.getImageData(0,0,64,32).data;let n=0,w=0,cl=0,wm=0,b=0;for(let i=0;i<p.length;i+=4){const r=p[i],gg=p[i+1],bl=p[i+2];n++;b+=(r+gg+bl)/765;if(r>200&&gg>200&&bl>200)w++;if(bl>r+30&&bl>90)cl++;if(r>bl+30&&r>120)wm++}
+  const f=eMM.f;return f==="white"?w/n:f==="cool"?cl/n:f==="warm"?wm/n:b/n}catch(e){return 0.5}}}}
+const eCv=document.createElement("canvas");eCv.width=64;eCv.height=32;const eCx=eCv.getContext("2d",{willReadFrequently:true});let eSmm={};
+function eStrips(v,f,N){eCx.drawImage(v,0,0,64,32);const p=eCx.getImageData(0,0,64,32).data,out=new Array(N).fill(0),cnt=new Array(N).fill(0);
+ for(let y=0;y<32;y++)for(let x=0;x<64;x++){const i=(y*64+x)*4,r=p[i],g=p[i+1],b=p[i+2],k=Math.floor(x*N/64);cnt[k]++;
+  const mx=Math.max(r,g,b),mn=Math.min(r,g,b);
+  out[k]+=f==="white"?(r>200&&g>200&&b>200):f==="cool"?(b>r+30&&b>90):f==="warm"?(r>b+30&&r>120):f==="bright"?(r+g+b)/765:f==="sat"?(mx?(mx-mn)/mx:0):0}
+ return out.map((s,k)=>s/cnt[k])}
+function eSweep(){const v=$("ev");let st;try{st=eStrips(v,eMM.f==="edge"?"bright":eMM.f,8)}catch(e){return null}
+ for(const x of st){eSmm.lo=Math.min(eSmm.lo??x,x);eSmm.hi=Math.max(eSmm.hi??x,x)}const [lo,hi]=eRange(eSmm.lo,eSmm.hi),now=Tone.now()+0.1;
+ st.forEach((x,k)=>{const a=hi>lo?Math.max(0,Math.min(1,(x-lo)/(hi-lo))):0;if(a<0.08)return;
+  sampler.triggerAttackRelease(Tone.Frequency(SCALE[Math.min(SCALE.length-1,Math.floor(a*SCALE.length))],"midi"),0.4,now+k*0.25,0.25+0.6*a)});
+ return st.map(x=>hi>lo?Math.max(0,Math.min(1,(x-lo)/(hi-lo))):0)}
+function eChunk(){const v=$("ev");if(v.paused)return;
+ if($("emode").value==="sweep"){const st=eSweep();if(!st)return;const a=st.reduce((p,c)=>p+c,0)/st.length;$("ebar").style.width=Math.round(a*100)+"%";
+  const dirs=["far west","west","west-centre","centre-west","centre-east","east-centre","east","far east"],top=st.indexOf(Math.max(...st));
+  if(Date.now()-eSay>3900){eSay=Date.now();$("einfo").textContent="Sweep west→east: "+st.filter(x=>x>=0.08).length+" of 8 strips sound; strongest "+ENAME[eMM.f]+" in the "+dirs[top]+"."}return}
+ const a=eAmt(),t0=Math.min(...notes.map(n=>n.t))+20,W=2,now=Tone.now()+0.1;
+ const span=Math.max(...notes.map(n=>n.t))-t0-W;if(ePos>span)ePos=0;
+ vib(a);comp.gain.rampTo(eqGain(a),0.3);
+ notes.filter(n=>n.t>=t0+ePos&&n.t<t0+ePos+W&&keepWith(n,a)).forEach(n=>sampler.triggerAttackRelease(Tone.Frequency(n.m,"midi"),n.d,now+n.t-t0-ePos,n.v*0.9));
+ if($("dv").checked)dsyn.triggerAttackRelease(Tone.Frequency(dataPitch(a),"midi"),1.6,now);
+ ePos+=W;$("ebar").style.width=Math.round(a*100)+"%";
+ const lvl=a<0.05?"almost silent":a<0.3?"sparse, only the lowest notes":a<0.7?"half the piano":"nearly the full piano";
+ const pc=v=>(v*100).toFixed(v<0.1?1:0)+"%";$("ebar").title=lvl;
+ if(Date.now()-eSay>1900){eSay=Date.now();$("einfo").textContent="Piano follows "+ENAME[eMM.f]+": "+pc(eMM.x)+" of this frame (this animation ranges "+pc(eMM.rlo)+"–"+pc(eMM.rhi)+") — "+lvl+"."}}
+async function ePlay(){stopAll();await ensure();eStop();ePos=0;eSmm={};const v=$("ev");v.currentTime=0;await v.play().catch(()=>{});eChunk();eTimer=setInterval(eChunk,2000)}
+function eStop(){clearInterval(eTimer);eTimer=null;try{$("ev").pause();sampler&&sampler.releaseAll()}catch(e){}}
+$("eplay").onclick=ePlay;$("estop").onclick=eStop;
+$("efile").onchange=e=>{const f=e.target.files[0];if(!f)return;eStop();eLive=mkLive();eMM={f:$("efeat").value==="auto"?"white":$("efeat").value};$("ev").src=URL.createObjectURL(f);$("ev").muted=true;
+ $("esrc").textContent="Your own video: features estimated live from pixels (lower accuracy than the catalogue items above).";$("einfo").textContent="Press play."};
+eicLoad();
+</script>
+</body></html>

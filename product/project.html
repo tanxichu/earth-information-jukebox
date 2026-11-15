@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Listen to Earth — project page</title><link rel="icon" href="../icon192.png">
+<style>
+:root{--bg:#f4f5f8;--fg:#1c2030;--card:#fff;--ac:#1565c0;--mut:#555c70;--bd:#c9cedd}
+@media(prefers-color-scheme:dark){:root{--bg:#12141c;--fg:#e8eaf2;--card:#1d2030;--ac:#7db3ff;--mut:#a3aac0;--bd:#3a4058}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.65 system-ui,-apple-system,sans-serif}
+main{max-width:780px;margin:0 auto;padding:16px 16px 60px}h1{font-size:30px;line-height:1.2;margin:18px 0 6px}h2{font-size:22px;margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin:14px 0}.mut{color:var(--mut)}
+a.btn{display:block;text-align:center;background:var(--ac);color:#fff;border-radius:12px;padding:16px;font-size:22px;font-weight:700;text-decoration:none}
+@media(prefers-color-scheme:dark){a.btn{color:#101218}}
+table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid var(--bd);padding:8px;text-align:left;font-size:16px}audio{width:100%;margin:4px 0 12px}
+.q{font-size:21px;font-weight:600}
+</style></head><body><main>
+<h1>Listen to Earth</h1>
+<p class="q">A Debussy piano piece thins out as Arctic sea ice shrinks: the notes that play are decided by 48 years of NASA-hosted NSIDC data, and you can hear the same phrase in two different years.</p>
+<p><a class="btn" href="index.html">▶ Press to listen (about 1 minute)</a></p>
+
+<section class="card"><h2>Challenge</h2><p>NASA Space Apps 2026 · The Earth Information Jukebox. Earth data is shown mostly as images; this turns it into sound so blind and low-vision people can explore it, and anyone can feel it.</p></section>
+
+<section class="card"><h2>Demo</h2><video controls preload="metadata" style="width:100%;border-radius:10px" src="../demo/demo_draft.mp4" aria-label="30-second demo: Arctic sea ice in September 1980, 2012 and every year from 1979 to 2026, with the piano thinning as the ice shrinks. English captions are burned into the picture."></video><p class="mut">30-second demo with English captions burned in (<b>draft</b>: music, voice and visuals will be revised before submission).</p></section>
+
+<section class="card"><h2>How the data becomes sound</h2>
+<table><tr><th>Data</th><th>Sound</th></tr>
+<tr><td>September Arctic sea ice extent (million km²), one value per year, fixed scale 3–8</td><td>How much of the piano plays: ≥5% top melody line, ≥30% + bass, above that the inner voices return one by one</td></tr>
+<tr><td>The same number</td><td>A sine tone on a fixed D-dorian scale (D4–D6): higher = more ice</td></tr>
+<tr><td>Narration</td><td>Lowers the music <i>volume</i> only; never changes which notes play</td></tr></table>
+<p class="mut">Which notes exist, their pitch and rhythm are Debussy's. The data decides which of them are played. We do not claim that every note comes from data.</p></section>
+
+<section class="card"><h2>Hear it without the page</h2><p class="mut">Pre-rendered audio of the same rules (same 8-second phrase in different years, and the 1979→2026 sweep):</p><div id="pl">Loading…</div></section>
+
+<section class="card"><h2>What the data can and cannot say</h2>
+<p>One September value per year, so this is a long-term comparison, not a seasonal cycle. Largest in this record: 1980 (7.67 million km², 20% above the 1981–2010 mean of 6.41). Smallest: 2012 (3.57, 44% below). It shows a decline since 1979 with large year-to-year swings; it does not explain causes and a single year can rebound.</p></section>
+
+<section class="card"><h2>Evidence</h2>
+<p><b>Listening test: not yet run.</b> The test is ready: <a href="listening-test.html">listening-test.html</a> (narration off, picture hidden, pairs of the same phrase, answer "which has more ice"). We will report: how many listeners, whether they could tell more ice from less ice with narration off, picture hidden and numbers hidden, and where they struggled. No claim about blind or low-vision users is made until blind or low-vision listeners have tried it.</p>
+<p class="mut">Accessibility built in: keyboard operation, screen-reader text, a "read this year's data" button, a "why does it sound like this" button, vibration cues on Android, English and Chinese text.</p></section>
+
+<section class="card"><h2>Sources, licences, AI use</h2>
+<p>Data: NSIDC Sea Ice Index v4.0 (NOAA@NSIDC, G02135), Northern Hemisphere monthly extent, September file. Baseline: mean of 1981–2010 values in the same file. Music: Debussy, public-domain scores; MIDI from the Mutopia Project. Piano: Salamander Grand Piano samples (CC-BY, Alexander Holm). Libraries: Tone.js and @tonejs/midi (MIT). Narration: synthetic generic voice (VoxCPM2, Apache-2.0), not a clone of any person; the page falls back to the browser's built-in voice if the file is missing.</p>
+<p><b>AI use:</b> this page, the code, the text and the narration were made with AI assistance (Claude; VoxCPM2 for the voice). No voice or likeness of a minor appears in this work. Code is open source (<a href="https://github.com/tanxichu/earth-information-jukebox">https://github.com/tanxichu/earth-information-jukebox</a>).</p></section>
+</main>
+<script>
+fetch("../playlist/playlist.json").then(r=>r.json()).then(d=>{document.getElementById("pl").innerHTML=d.items.map(i=>"<div>"+i.title+"<audio controls preload=none src='../playlist/"+i.file+"'></audio></div>").join("")}).catch(()=>{document.getElementById("pl").textContent="Playlist is being rendered."});
+</script>
+</body></html>
