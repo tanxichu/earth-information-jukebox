@@ -6,9 +6,19 @@
 export const meta = { id: "P6", name: "Rhythm / groove", live: true };
 
 const STEP = 0.25, BAR = 2.0;
+const PENTA = [57, 60, 62, 64, 67, 69, 72, 74];
 const CHORDS = [[33, [57, 60, 64]], [29, [53, 57, 60]], [36, [55, 60, 64]], [31, [55, 59, 62]]];   // Am F C G
-const P = { swing: 0.12, hits: 1.8, floor: 0.03, tilt: 14, back: 0.3, bass: 0.5, shaker: 1.6, hat: 0.3, snare: 0.5,
-            shpan: 2.2, accent: 0.3, pad: 1.0, stab: 0.6, velMin: 0.25, velPow: 0.7, wet: 0.1, master: 1.0 };
+// presets mirror bench/pipelines/P6/render.py VERSIONS (v12 default; v16_dry / v16_lead = hard-panned dry hits, mono ducked pad/bass; v10 = pure rhythm)
+const BASE = { swing: 0.12, hits: 1.8, floor: 0.03, tilt: 14, back: 0.3, bass: 0.5, shaker: 1.6, hat: 0.3, snare: 0.5,
+  shpan: 2.2, accent: 0.3, pad: 1.0, stab: 0.6, velMin: 0.25, velPow: 0.7, wet: 0.1, master: 1.0,
+  harm: 1, hardpan: 0, dryHits: 0, mono: 0, low: 1, duck: 1, tick: 0, bright: 1, gdb: 0, gs: 0 };
+const V16 = { back: 0.1, shaker: 0.6, hat: 0.1, hits: 2.6, stab: 0, hardpan: 2, dryHits: 1, mono: 1, low: 0.6, duck: 0.5, bright: 2, gdb: -3.6, gs: 2.5 };
+const PRESETS = {
+  v12: {},
+  v16_dry: V16,
+  v16_lead: { ...V16, tick: 0.5 },
+  v10: { harm: 0, pad: 0, stab: 0, accent: 0, wet: 0.04, shaker: 1.6, back: 0.3, hat: 0.3, gdb: -0.9, gs: 3 },
+};
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
 function pool(tri, n = 8, lo = 57) {
   let out = [], o = 0;
@@ -20,6 +30,7 @@ function pool(tri, n = 8, lo = 57) {
 }
 
 export async function createEngine(ctx, opts) {
+  const P = { ...BASE, ...(PRESETS[opts.preset || "v12"] || {}) };
   const dest = opts.destination || ctx.destination, fps = opts.fps || 4;
   // robust ranges from opts; if missing, fall back to a running min/max of the frames received so far (causal)
   const wr = opts.whole_range ? null : [Infinity, -Infinity], sr_ = opts.strip_range ? null : [Infinity, -Infinity];
@@ -46,10 +57,12 @@ export async function createEngine(ctx, opts) {
   // shared noise
   const nbuf = ctx.createBuffer(1, sr, sr), nd = nbuf.getChannelData(0); for (let i = 0; i < sr; i++) nd[i] = gauss();
 
-  const panner = p => { const n = ctx.createStereoPanner(); n.pan.value = Math.max(-1, Math.min(1, p)); n.connect(mix); return n; };
+  const dry = ctx.createGain(); dry.connect(agc);                       // un-reverbed bus (hits, tick)
+  const pbus = ctx.createGain(); pbus.connect(mix);                      // pad / bass / stab bus (ducked under hits in the v16 presets)
+  const panner = (p, out = mix) => { const n = ctx.createStereoPanner(); n.pan.value = Math.max(-1, Math.min(1, p)); n.connect(out); return n; };
   // partial: sine at freq with exponential decay (time constant dec), short attack
-  function tone(t0, dur, freq, amp, dec, pan, att = 0.002, harm = [[1, 1, dec]]) {
-    const pn = panner(pan);
+  function tone(t0, dur, freq, amp, dec, pan, att = 0.002, harm = [[1, 1, dec]], out = mix) {
+    const pn = panner(pan, out);
     for (const [r, a, d] of harm) {
       const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = freq * r;
       g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(amp * a, t0 + att); g.gain.setTargetAtTime(0, t0 + att, d);
@@ -76,7 +89,7 @@ export async function createEngine(ctx, opts) {
     wHist.push(w); if (wHist.length > 8) wHist.shift();
     const wb = wHist.reduce((a, v) => a + v, 0) / wHist.length;     // causal bar mean (last <= 8 frames)
     wSum += w; const prior = (opts.anim_stats && opts.anim_stats.whole_mean != null) ? opts.anim_stats.whole_mean : 0.35, mAvg = (wSum + 4 * prior) / (f + 4);   // animation mean (when known) only as the prior of the running mean: the 12-s clip differs from the full animation
-    agc.gain.setTargetAtTime(Math.pow(10, Math.min(12, -16 - 19.5 * Math.log10(Math.max(mAvg, 0.02))) / 20), time, 1.0);
+    agc.gain.setTargetAtTime(Math.pow(10, Math.min(12, P.gdb - 16 - (19.5 + P.gs) * Math.log10(Math.max(mAvg, 0.02))) / 20), time, 1.0);
     const [root, tri] = CHORDS[b % 4], pl = pool(tri);
     const lvl = Math.pow(10, (w - 0.5) * P.tilt / 20), bg = (P.floor + (1 - P.floor) * w) * P.back * lvl;
     const c = cen(S), sw = (k % 2 ? P.swing * STEP : 0), t0 = time + sw;
@@ -89,25 +102,28 @@ export async function createEngine(ctx, opts) {
     if (rank < nh) {
       const v = P.velMin + (1 - P.velMin) * Math.pow(S[k], P.velPow);
       const amp = P.hits * v * lvl * (1 + P.accent * (k === 0 || k === 4 ? 1 : 0) - P.accent * 0.4 * (k % 2)) * 0.6;
-      tone(t0, 0.6, mtof(pl[k]), amp, 0.25, (k - 3.5) / 3.5, 0.002, [[1, 1, 0.25], [4, 0.35, 0.06], [9.9, 0.12, 0.02]]);
+      const pan = P.hardpan === 2 ? Math.max(-1, Math.min(1, (k - 3.5) / 3.5 * 1.7)) : (k - 3.5) / 3.5;
+      if (P.duck < 1) { pbus.gain.setTargetAtTime(P.duck, t0, 0.008); pbus.gain.setTargetAtTime(1, t0 + 0.12, 0.02); }
+      tone(t0, 0.6, mtof(P.harm ? pl[k] : PENTA[k]), amp, 0.25, pan, 0.002, [[1, 1, 0.25], [4, 0.35 * P.bright, 0.06], [9.9, 0.12 * P.bright, 0.02]], P.dryHits ? dry : mix);
     }
     // 16th shaker (2 per step) panned to centroid
     const lv = lvl * Math.pow(w, 0.8);
     for (let j = 0; j < 2; j++) burst(time + j * 0.125 + (j ? P.swing * 0.125 : 0), 0.05, 0.35 * 0.7 * P.shaker * lv, 0.015, 5000, c);
     // bass (root on 1, fifth on 3)
     if (k === 0 || k === 4) {
-      const m = k === 4 && wb > 0.3 ? root + 7 : root, bl = P.bass * (0.3 + 0.7 * wb);
-      tone(time, 0.45, mtof(m), 0.5 * bl, 0.3, c, 0.005, [[1, 1, 0.3], [2, 0.3, 0.3]]);
+      const r0 = P.harm ? root : 33, m = k === 4 && wb > 0.3 ? r0 + 7 : r0, bl = P.bass * (0.3 + 0.7 * wb);
+      tone(time, 0.45, mtof(m), 0.5 * bl * P.low, 0.3, P.mono ? 0 : c, 0.005, [[1, 1, 0.3], [2, 0.3, 0.3]], P.mono ? pbus : mix);
     }
     // pad (bar start) and stabs (steps 0, 3, 6)
-    if (k === 0 || k === 3 || k === 6) {
+    if (k === 0 && P.tick) tone(time, 0.03, 1500, P.tick * 0.6, 0.008, 0, 0.0005, [[1, 1, 0.008]], dry);
+    if ((P.pad || P.stab) && (k === 0 || k === 3 || k === 6)) {
       tri.forEach((m, i) => {
-        if (k === 0) { const pn = c * 0.5 + c * (i - 1) * 0.3 * 1;
-          for (const dt of [-0.003, 0, 0.003]) { const o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), pnn = panner(pn);
+        if (k === 0 && P.pad) { const pn = P.mono ? 0 : c * 0.5 + c * (i - 1) * 0.3 * 1;
+          for (const dt of [-0.003, 0, 0.003]) { const o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), pnn = panner(pn, P.mono ? pbus : mix);
             const fr = mtof(m + 12) * (1 + dt); o.frequency.value = fr; o2.frequency.value = fr * 2; const g2 = ctx.createGain(); g2.gain.value = 0.3;
-            const a = 0.12 * P.pad * (0.3 + 0.7 * wb); g.gain.setValueAtTime(0, time); g.gain.linearRampToValueAtTime(a, time + 0.2); g.gain.setValueAtTime(a, time + 1.7); g.gain.linearRampToValueAtTime(0, time + 2.0);
+            const a = 0.12 * P.pad * P.low * (0.3 + 0.7 * wb); g.gain.setValueAtTime(0, time); g.gain.linearRampToValueAtTime(a, time + 0.2); g.gain.setValueAtTime(a, time + 1.7); g.gain.linearRampToValueAtTime(0, time + 2.0);
             o.connect(g); o2.connect(g2).connect(g); g.connect(pnn); o.start(time); o2.start(time); o.stop(time + 2); o2.stop(time + 2); } }
-        tone(t0, 0.3, mtof(m + 12), 0.2 * P.stab * (0.4 + 0.6 * wb) * (k === 0 ? 1 : 0.6), 0.09, c * 0.5);
+        if (P.stab) tone(t0, 0.3, mtof(m + 12), 0.2 * P.stab * P.low * (0.4 + 0.6 * wb) * (k === 0 ? 1 : 0.6), 0.09, P.mono ? 0 : c * 0.5, 0.002, [[1, 1, 0.09]], P.mono ? pbus : mix);
       });
     }
   }
