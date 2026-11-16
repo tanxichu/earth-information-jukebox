@@ -7,7 +7,6 @@
 // Differences from the Python h4a: P3.js is the P3_v8_motif port (chord loop + motif, own AGC), P6.js is v12 in A minor (Python h4a used v8), all causal.
 export const meta = { id: "P7", name: "Hybrid (strips + piano + groove)", live: true };
 import { createEngine as createP3 } from "./P3.js";
-import { createEngine as createP6 } from "./P6.js";
 import { createPianoLayer } from "./P1.js";
 
 const RMS = { p3: 0.0633, p1: 0.0231, p6: 0.0840 };        // alone-rendered mean RMS on the main set (full-scale = 1)
@@ -59,6 +58,7 @@ export async function createEngine(ctx, opts = {}) {
   const send = (b, k) => { if (lite) { const g = ctx.createGain(); g.gain.value = SEND[k]; b.connect(g).connect(sendIn); } };
   send(b3, "p3"); send(b1, "p1"); send(b6, "p6");
   const base = { ...opts };
+  const createP6 = (await import(opts.preset === "h5a" ? "./P6_D.js" : "./P6.js")).createEngine;   // h5a: groove in the piano's D-major progression
   const [e3, e1, e6] = await Promise.all([
     createP3(sub, { ...base, destination: b3 }),
     createPianoLayer(sub, { ...base, destination: b1, gain: 1, preset: "c3" }),
